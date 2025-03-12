@@ -114,7 +114,7 @@ def display_balance_sheet(xls, stock_label, sheet_balance, key_suffix=""):
 
 def display_cash_flow(xls, stock_label, sheet_cf, key_suffix=""):
     st.subheader(f"{stock_label} – Cash Flow Analysis")
-    all_metrics = ["Cash Provided by Operations", "Capital Spending", "FCF", "Depreciation and Amortization"]
+    all_metrics = ["Cash Provided by Operations", "Capital Spending", "Free Cash Flow", "Depreciation and Amortization"]
     selected_metrics = st.multiselect(
         f"Select Cash Flow metrics for {stock_label}", 
         all_metrics, default=all_metrics, key=f"{stock_label}_cf_metrics{key_suffix}"
@@ -217,7 +217,7 @@ def get_outstanding_shares(xls, stock_label, sheet_balance, key_suffix=""):
 
 def display_dcf_analysis(xls, stock_label, sheet_cf, sheet_balance, key_suffix=""):
     st.subheader(f"{stock_label} – DCF Analysis")
-    df_fcf = get_metric_data(xls, sheet_cf, ["FCF"], skiprows=4, metric_col=1, data_col_start=2, data_col_end=7)
+    df_fcf = get_metric_data(xls, sheet_cf, ["Free Cash Flow"], skiprows=4, metric_col=1, data_col_start=2, data_col_end=7)
     if df_fcf.empty:
         st.error("Could not find 'FCF' data.")
         return None
@@ -293,11 +293,11 @@ def display_additional_valuation_multiples(xls, stock_label, outstanding_shares,
     else:
         df_op_val = df_op.copy()
     df_inc = get_metric_data(xls, sheet_income, ["Net Income", "Operating Profit", "Gross Profit"])
-    df_cf = get_metric_data(xls, sheet_cf, ["FCF"])
+    df_cf = get_metric_data(xls, sheet_cf, ["Free Cash Flow"])
     df_bs = get_metric_data(xls, sheet_balance, ["Total Stockholders' Equity", "Tangible Book Value"])
     
     valuation_mapping = {
-        "P/FCF": ("Price to Free Cash Flow", "FCF", df_cf),
+        "P/FCF": ("Price to Free Cash Flow", "Free Cash Flow", df_cf),
         "P/E": ("Price to Earnings", "Net Income", df_inc),
         "P/Operating Income": ("Price to Operating Income", "Operating Profit", df_inc),
         "P/Gross Profit": ("Price to Gross Profit", "Gross Profit", df_inc),
@@ -503,8 +503,8 @@ def compare_fcf_projections_bar_chart(xls, sheet_cf1, sheet_cf2, scenario, num_y
     and plots a grouped bar chart.
     """
     # Get FCF data from each sheet:
-    df_fcf1 = get_metric_data(xls, sheet_cf1, ["FCF"], skiprows=4, metric_col=1, data_col_start=2, data_col_end=7)
-    df_fcf2 = get_metric_data(xls, sheet_cf2, ["FCF"], skiprows=4, metric_col=1, data_col_start=2, data_col_end=7)
+    df_fcf1 = get_metric_data(xls, sheet_cf1, ["Free Cash Flow"], skiprows=4, metric_col=1, data_col_start=2, data_col_end=7)
+    df_fcf2 = get_metric_data(xls, sheet_cf2, ["Free Cash Flow"], skiprows=4, metric_col=1, data_col_start=2, data_col_end=7)
     if df_fcf1.empty or df_fcf2.empty:
         st.warning("FCF data not found in one of the Cash Flow sheets.")
         return
@@ -563,7 +563,7 @@ def compare_valuation_multiples_bar_chart(xls, sheet_op1, sheet_inc1, sheet_cf1,
         return
     # For simplicity, assume underlying metric and source data based on method:
     mapping = {
-        "P/FCF": ("FCF", sheet_cf1, sheet_cf2),
+        "P/FCF": ("Free Cash Flow", sheet_cf1, sheet_cf2),
         "P/E": ("Net Income", sheet_inc1, sheet_inc2),
         "P/Operating Income": ("Operating Profit", sheet_inc1, sheet_inc2),
         "P/Gross Profit": ("Gross Profit", sheet_inc1, sheet_inc2),
@@ -690,7 +690,7 @@ if uploaded_file is not None:
                          cost_metric, "Fixed vs Variable Costs", num_years)
         
         st.markdown("**Cash Flow Comparison**")
-        cf_metric = st.selectbox("Select Cash Flow metric", ["Cash Provided by Operations", "Capital Spending", "FCF", "Depreciation and Amortization"], key="comp_cf_metric")
+        cf_metric = st.selectbox("Select Cash Flow metric", ["Cash Provided by Operations", "Capital Spending", "Free Cash Flow", "Depreciation and Amortization"], key="comp_cf_metric")
         compare_bar_chart(xls, sheet_cf1, sheet_cf2, cf_metric, "Cash Flow", num_years)
         
         st.markdown("**Free Cash Flow Projections Comparison**")
