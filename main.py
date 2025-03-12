@@ -62,13 +62,39 @@ def plot_metrics_plotly(df_section, title):
     return fig
 
 #####################################
-# Global Setup
+# New Helper: Compute Free Cash Flow
 #####################################
-# Historical years in descending order (most recent first)
+def get_free_cash_flow(xls, sheet_cf, skiprows=4, metric_col=1, data_col_start=2, data_col_end=7):
+    """
+    Attempts to retrieve a row named 'Free Cash Flow' from the Cash Flow sheet.
+    If not found, computes it as:
+         FCF = Cash Provided by Operations – Capital Spending
+    Returns a DataFrame with index 'Free Cash Flow'.
+    """
+    df_fcf = get_metric_data(xls, sheet_cf, ["Free Cash Flow"], skiprows=skiprows, 
+                             metric_col=metric_col, data_col_start=data_col_start, data_col_end=data_col_end)
+    if not df_fcf.empty:
+        return df_fcf
+    else:
+        df_cfo = get_metric_data(xls, sheet_cf, ["Cash Provided by Operations"], skiprows=skiprows, 
+                                 metric_col=metric_col, data_col_start=data_col_start, data_col_end=data_col_end)
+        df_capex = get_metric_data(xls, sheet_cf, ["Capital Spending"], skiprows=skiprows, 
+                                   metric_col=metric_col, data_col_start=data_col_start, data_col_end=data_col_end)
+        if df_cfo.empty or df_capex.empty:
+            return pd.DataFrame()
+        cfo_values = pd.to_numeric(df_cfo.iloc[0], errors='coerce')
+        capex_values = pd.to_numeric(df_capex.iloc[0], errors='coerce')
+        fcf_values = cfo_values - capex_values
+        fcf_df = pd.DataFrame([fcf_values], index=["Free Cash Flow"], columns=df_cfo.columns)
+        return fcf_df
+
+#####################################
+# Global Setup: Historical Years (Descending Order)
+#####################################
 hist_years = ['2024', '2023', '2022', '2021', '2020']
 
 #####################################
-# Section Functions (using pre-selected sheet names and unique keys)
+# Section Functions – Using Pre-selected Sheet Names & Unique Keys
 #####################################
 
 def display_income_statement(xls, stock_label, sheet_income, key_suffix=""):
@@ -114,12 +140,28 @@ def display_balance_sheet(xls, stock_label, sheet_balance, key_suffix=""):
 
 def display_cash_flow(xls, stock_label, sheet_cf, key_suffix=""):
     st.subheader(f"{stock_label} – Cash Flow Analysis")
+    # Allow selection of metrics; note that when "Free Cash Flow" is selected, we compute it.
     all_metrics = ["Cash Provided by Operations", "Capital Spending", "Free Cash Flow", "Depreciation and Amortization"]
     selected_metrics = st.multiselect(
         f"Select Cash Flow metrics for {stock_label}", 
         all_metrics, default=all_metrics, key=f"{stock_label}_cf_metrics{key_suffix}"
     )
-    df = get_metric_data(xls, sheet_cf, selected_metrics)
+    # Get data for selected metrics excluding "Free Cash Flow"
+    df = get_metric_data(xls, sheet_cf, [m for m in selected_metrics if m != "Free Cash Flow"])
+    
+    # If Free Cash Flow is selected, compute it as CFO minus Capex
+    if "Free Cash Flow" in selected_metrics:
+        df_cfo = get_metric_data(xls, sheet_cf, ["Cash Provided by Operations"], skiprows=4, metric_col=1, data_col_start=2, data_col_end=7)
+        df_capex = get_metric_data(xls, sheet_cf, ["Capital Spending"], skiprows=4, metric_col=1, data_col_start=2, data_col_end=7)
+        if not df_cfo.empty and not df_capex.empty:
+            cfo_values = pd.to_numeric(df_cfo.iloc[0], errors='coerce')
+            capex_values = pd.to_numeric(df_capex.iloc[0], errors='coerce')
+            fcf_values = cfo_values - capex_values
+            df_fcf = pd.DataFrame([fcf_values], index=["Free Cash Flow"], columns=df_cfo.columns)
+        else:
+            df_fcf = pd.DataFrame()
+        df = pd.concat([df, df_fcf])
+    
     if not df.empty:
         df.columns = hist_years
         cagr_dict = {m: calculate_cagr(pd.to_numeric(df.loc[m].dropna(), errors='coerce')) for m in df.index}
@@ -217,9 +259,10 @@ def get_outstanding_shares(xls, stock_label, sheet_balance, key_suffix=""):
 
 def display_dcf_analysis(xls, stock_label, sheet_cf, sheet_balance, key_suffix=""):
     st.subheader(f"{stock_label} – DCF Analysis")
-    df_fcf = get_metric_data(xls, sheet_cf, ["Free Cash Flow"], skiprows=4, metric_col=1, data_col_start=2, data_col_end=7)
+    # Use the new helper to compute FCF from Cash Provided by Operations minus Capital Spending
+    df_fcf = get_free_cash_flow(xls, sheet_cf, skiprows=4, metric_col=1, data_col_start=2, data_col_end=7)
     if df_fcf.empty:
-        st.error("Could not find 'FCF' data.")
+        st.error("Could not compute Free Cash Flow (ensure that either a 'Free Cash Flow' row exists or that 'Cash Provided by Operations' and 'Capital Spending' are present).")
         return None
     free_cf_data = pd.to_numeric(df_fcf.iloc[0].dropna(), errors='coerce')
     if len(free_cf_data) < 5:
@@ -292,12 +335,13 @@ def display_additional_valuation_multiples(xls, stock_label, outstanding_shares,
         df_op_val = df_op.drop(columns="CAGR")
     else:
         df_op_val = df_op.copy()
+    # For P/FCF, use computed FCF; for others, use underlying data from Income or Balance sheets.
+    df_fcf = get_free_cash_flow(xls, sheet_cf, skiprows=4, metric_col=1, data_col_start=2, data_col_end=7)
     df_inc = get_metric_data(xls, sheet_income, ["Net Income", "Operating Profit", "Gross Profit"])
-    df_cf = get_metric_data(xls, sheet_cf, ["Free Cash Flow"])
     df_bs = get_metric_data(xls, sheet_balance, ["Total Stockholders' Equity", "Tangible Book Value"])
     
     valuation_mapping = {
-        "P/FCF": ("Price to Free Cash Flow", "Free Cash Flow", df_cf),
+        "P/FCF": ("Price to Free Cash Flow", "Free Cash Flow", df_fcf),
         "P/E": ("Price to Earnings", "Net Income", df_inc),
         "P/Operating Income": ("Price to Operating Income", "Operating Profit", df_inc),
         "P/Gross Profit": ("Price to Gross Profit", "Gross Profit", df_inc),
@@ -469,14 +513,7 @@ def display_additional_valuation_multiples(xls, stock_label, outstanding_shares,
 # Comparison Bar Chart Functions
 #####################################
 
-# For each category, we define a function that compares a single selected metric (not an average).
-# The x-axis will be the selected years and the bars will be for Stock 1 and Stock 2.
-
 def compare_bar_chart(xls, sheet1, sheet2, metric, category, num_years):
-    """
-    Retrieves the row for a given metric from two sheets and plots a grouped bar chart.
-    category: a string indicating which category ("Income Statement", "Balance Sheet", etc.)
-    """
     df1 = get_metric_data(xls, sheet1, [metric])
     df2 = get_metric_data(xls, sheet2, [metric])
     if df1.empty or df2.empty:
@@ -498,13 +535,8 @@ def compare_bar_chart(xls, sheet1, sheet2, metric, category, num_years):
     st.plotly_chart(fig, use_container_width=True, key=f"comp_bar_{category}_{metric}")
 
 def compare_fcf_projections_bar_chart(xls, sheet_cf1, sheet_cf2, scenario, num_years):
-    """
-    Computes FCF projections from the given cash flow sheets for both stocks, for a chosen scenario,
-    and plots a grouped bar chart.
-    """
-    # Get FCF data from each sheet:
-    df_fcf1 = get_metric_data(xls, sheet_cf1, ["Free Cash Flow"], skiprows=4, metric_col=1, data_col_start=2, data_col_end=7)
-    df_fcf2 = get_metric_data(xls, sheet_cf2, ["Free Cash Flow"], skiprows=4, metric_col=1, data_col_start=2, data_col_end=7)
+    df_fcf1 = get_free_cash_flow(xls, sheet_cf1, skiprows=4, metric_col=1, data_col_start=2, data_col_end=7)
+    df_fcf2 = get_free_cash_flow(xls, sheet_cf2, skiprows=4, metric_col=1, data_col_start=2, data_col_end=7)
     if df_fcf1.empty or df_fcf2.empty:
         st.warning("FCF data not found in one of the Cash Flow sheets.")
         return
@@ -515,7 +547,6 @@ def compare_fcf_projections_bar_chart(xls, sheet_cf1, sheet_cf2, scenario, num_y
         return
     fcf_last5_1 = free_cf1[-5:].values.astype(float)
     fcf_last5_2 = free_cf2[-5:].values.astype(float)
-    # Compute growth rates and projections for each stock:
     def project_fcf(fcf_array):
         gr = [(fcf_array[i] / fcf_array[i-1] - 1) for i in range(1, len(fcf_array))]
         avg_gr = np.mean(gr)
@@ -534,7 +565,6 @@ def compare_fcf_projections_bar_chart(xls, sheet_cf1, sheet_cf2, scenario, num_y
     proj1 = project_fcf(fcf_last5_1)
     proj2 = project_fcf(fcf_last5_2)
     years_used = [f"Year{i}" for i in range(1, num_years+1)]
-    # Use only the first num_years of projections:
     proj1 = proj1[:num_years]
     proj2 = proj2[:num_years]
     fig = go.Figure(data=[
@@ -546,22 +576,15 @@ def compare_fcf_projections_bar_chart(xls, sheet_cf1, sheet_cf2, scenario, num_y
                       xaxis_title="Projection Year",
                       yaxis_title="Projected FCF")
     st.plotly_chart(fig, use_container_width=True, key=f"comp_bar_FCF_{scenario}")
-    
+
 def compare_valuation_multiples_bar_chart(xls, sheet_op1, sheet_inc1, sheet_cf1, sheet_balance1,
                                             sheet_op2, sheet_inc2, sheet_cf2, sheet_balance2,
                                             method, scenario, num_years):
-    """
-    For a chosen valuation multiple method (e.g., 'P/E') and scenario, compute the target prices
-    for each stock and display a grouped bar chart comparing them per projection year.
-    We'll reuse logic from the additional multiples functions.
-    """
-    # We'll need to get the multiple from the operating metrics sheet for each stock:
     df_op1 = get_metric_data(xls, sheet_op1, [method])
     df_op2 = get_metric_data(xls, sheet_op2, [method])
     if df_op1.empty or df_op2.empty:
         st.warning(f"Valuation multiple '{method}' not found for one of the stocks.")
         return
-    # For simplicity, assume underlying metric and source data based on method:
     mapping = {
         "P/FCF": ("Free Cash Flow", sheet_cf1, sheet_cf2),
         "P/E": ("Net Income", sheet_inc1, sheet_inc2),
@@ -574,7 +597,6 @@ def compare_valuation_multiples_bar_chart(xls, sheet_op1, sheet_inc1, sheet_cf1,
         st.warning(f"Method {method} not supported for comparison.")
         return
     underlying_metric, underlying_sheet1, underlying_sheet2 = mapping[method]
-    # Get underlying data for both stocks:
     df_under1 = get_metric_data(xls, underlying_sheet1, [underlying_metric])
     df_under2 = get_metric_data(xls, underlying_sheet2, [underlying_metric])
     if df_under1.empty or df_under2.empty:
@@ -582,11 +604,8 @@ def compare_valuation_multiples_bar_chart(xls, sheet_op1, sheet_inc1, sheet_cf1,
         return
     df_under1.columns = hist_years
     df_under2.columns = hist_years
-    # For the multiple, we need the average value from operating metrics:
     mult1 = pd.to_numeric(df_op1.loc[method].dropna(), errors='coerce').mean()
     mult2 = pd.to_numeric(df_op2.loc[method].dropna(), errors='coerce').mean()
-    # We'll assume for comparison we use the average multiple (could also use expected scenario logic, but for simplicity):
-    # For projecting underlying, we compute CAGR and project:
     def project_value(df_under):
         values = pd.to_numeric(df_under.iloc[0].dropna(), errors='coerce').values
         if len(values) < 5:
@@ -605,7 +624,6 @@ def compare_valuation_multiples_bar_chart(xls, sheet_op1, sheet_inc1, sheet_cf1,
     if proj1 is None or proj2 is None:
         st.warning("Not enough data for projecting underlying metric for valuation multiples.")
         return
-    # Now target price = projected underlying * multiple.
     target1 = [proj1[i] * mult1 for i in range(num_years)]
     target2 = [proj2[i] * mult2 for i in range(num_years)]
     years_used = [f"Year{i}" for i in range(1, num_years+1)]
@@ -618,7 +636,7 @@ def compare_valuation_multiples_bar_chart(xls, sheet_op1, sheet_inc1, sheet_cf1,
                       xaxis_title="Projection Year",
                       yaxis_title="Target Price")
     st.plotly_chart(fig, use_container_width=True, key=f"comp_bar_valuation_{method}_{scenario}")
-    
+
 #####################################
 # Main Multi-Stock Dashboard (Single Excel File)
 #####################################
@@ -670,41 +688,44 @@ if uploaded_file is not None:
     
     with tab3:
         st.title("Comparison Dashboard")
-        st.subheader("Bar Chart Comparisons")
-        num_years = st.slider("Select number of years (for comparison charts)", 1, 5, 3, key="comp_years")
+        st.subheader("Income Statement Comparison")
+        col1, col2 = st.columns(2)
+        with col1:
+            compare_bar_chart(xls, sheet_income1, sheet_income2, "Net Sales", "Income Statement", 3)
+        with col2:
+            compare_bar_chart(xls, sheet_income1, sheet_income2, "Net Income", "Income Statement", 3)
         
-        st.markdown("**Income Statement Comparison**")
-        # Let the user choose a metric from a preset list:
-        inc_metric = st.selectbox("Select Income Statement metric", ["Net Sales", "Gross Profit", "Net Income"], key="comp_inc_metric")
-        compare_bar_chart(xls, sheet_income1, sheet_income2, inc_metric, "Income Statement", num_years)
+        st.subheader("Balance Sheet Comparison")
+        col1, col2 = st.columns(2)
+        with col1:
+            compare_bar_chart(xls, sheet_balance1, sheet_balance2, "Total Current Assets", "Balance Sheet", 3)
+        with col2:
+            compare_bar_chart(xls, sheet_balance1, sheet_balance2, "Outstanding Shares", "Balance Sheet", 3)
         
-        st.markdown("**Balance Sheet Comparison**")
-        bal_metric = st.selectbox("Select Balance Sheet metric", ["Total Current Assets", "Total Stockholders' Equity", "Outstanding Shares"], key="comp_bal_metric")
-        compare_bar_chart(xls, sheet_balance1, sheet_balance2, bal_metric, "Balance Sheet", num_years)
+        st.subheader("Fixed vs Variable Costs Comparison")
+        compare_bar_chart(xls, sheet_income1 if "General and Administrative Expenses" in get_metric_data(xls, sheet_income1, ["General and Administrative Expenses"]).index 
+                         else sheet_cf1, 
+                         sheet_income2 if "General and Administrative Expenses" in get_metric_data(xls, sheet_income2, ["General and Administrative Expenses"]).index 
+                         else sheet_cf2, 
+                         "General and Administrative Expenses", "Fixed vs Variable Costs", 3)
         
-        st.markdown("**Fixed vs Variable Costs Comparison**")
-        # For fixed/variable, let the user choose one cost metric:
-        cost_metric = st.selectbox("Select Cost metric", ["Depreciation and Amortization", "General and Administrative Expenses", "Cost of Products Sold", "Marketing, Research, General Expenses"], key="comp_cost_metric")
-        compare_bar_chart(xls, sheet_income1 if cost_metric!="Depreciation and Amortization" else sheet_cf1, 
-                         sheet_income2 if cost_metric!="Depreciation and Amortization" else sheet_cf2, 
-                         cost_metric, "Fixed vs Variable Costs", num_years)
+        st.subheader("Cash Flow Comparison")
+        compare_bar_chart(xls, sheet_cf1, sheet_cf2, "Cash Provided by Operations", "Cash Flow", 3)
         
-        st.markdown("**Cash Flow Comparison**")
-        cf_metric = st.selectbox("Select Cash Flow metric", ["Cash Provided by Operations", "Capital Spending", "Free Cash Flow", "Depreciation and Amortization"], key="comp_cf_metric")
-        compare_bar_chart(xls, sheet_cf1, sheet_cf2, cf_metric, "Cash Flow", num_years)
-        
-        st.markdown("**Free Cash Flow Projections Comparison**")
+        st.subheader("Free Cash Flow Projections Comparison")
         scenario_choice = st.selectbox("Select FCF projection scenario", ["Conservative", "Expected", "Aggressive"], key="comp_fcf_scenario")
-        compare_fcf_projections_bar_chart(xls, sheet_cf1, sheet_cf2, scenario_choice, num_years)
+        compare_fcf_projections_bar_chart(xls, sheet_cf1, sheet_cf2, scenario_choice, 3)
         
-        st.markdown("**Valuation Multiples Comparison**")
+        st.subheader("Valuation Multiples Comparison")
         val_method = st.selectbox("Select Valuation Multiple Method", ["P/FCF", "P/E", "P/Operating Income", "P/Gross Profit", "P/B", "P/Tangible Book"], key="comp_val_method")
         val_scenario = st.selectbox("Select Valuation Scenario", ["Conservative", "Expected", "Aggressive"], key="comp_val_scenario")
         compare_valuation_multiples_bar_chart(xls, sheet_op1, sheet_income1, sheet_cf1, sheet_balance1,
                                               sheet_op2, sheet_income2, sheet_cf2, sheet_balance2,
-                                              val_method, val_scenario, num_years)
+                                              val_method, val_scenario, 3)
 else:
     st.info("Please upload one Excel file containing all sheets for both stocks.")
+
+
 
 
 
