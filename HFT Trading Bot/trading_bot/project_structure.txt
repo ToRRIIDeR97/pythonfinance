@@ -1,0 +1,10 @@
+trading_bot/
+├── config.py           # Configuration (API keys, parameters)
+├── htx_client.py       # Handles HTX API communication (REST & WebSocket)
+├── data_handler.py     # Processes incoming market data
+├── strategy.py         # Implements the trading logic
+├── order_manager.py    # Tracks orders, positions, P&L
+├── risk_manager.py     # Enforces risk rules
+├── main.py             # Main application entry point
+└── utils.py            # Utility functions (e.g., logging setup)
+└── requirements.txt    # Python dependencies

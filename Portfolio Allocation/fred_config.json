@@ -1,0 +1,17 @@
+{
+  "USA": {
+    "gdp_growth": "A191RP1A027NBEA",
+    "inflation": "FPCPITOTLZGUSA",
+    "gdp_source_is_growth_rate": true
+  },
+  "CHN": {
+    "gdp_growth": "MKTGDPCN", 
+    "inflation": "FPCPITOTLZGCHN",
+    "gdp_source_is_growth_rate": false 
+  },
+  "ARG": {
+    "gdp_growth": "MKTGDPAR", 
+    "inflation": "FPCPITOTLZGARG",
+    "gdp_source_is_growth_rate": false
+  }
+} 

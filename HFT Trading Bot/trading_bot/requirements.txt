@@ -1,0 +1,5 @@
+websockets
+aiohttp
+python-dotenv  # For loading environment variables (recommended for secrets)
+# numpy        # If using numpy for calculations
+# pyyaml       # If using YAML for config
