@@ -1,0 +1,55 @@
+# Virtual Environment
+venv/
+env/
+ENV/
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# MacOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Model checkpoints and data
+*.h5
+*.hdf5
+*.pkl
+*.model
+*.tfevents.*
+
+# Logs
+logs/
+*.log
+
+# Keras Tuner directories
+keras_tuner_dir*/
+keras_tuner_dir_tfdata*/
+keras_tuner_dir_recall0*/
