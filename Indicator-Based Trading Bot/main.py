@@ -255,30 +255,57 @@ class ConvergingSignalsStrategy(Strategy):
         self.name = f"Converging Signals ({self.min_signals_to_converge}/{len(strategies)})"
 
     def generate_signals(self):
-        if not self.strategies: return pd.DataFrame(0, index=self.data.index, columns=['signal'])
+        print(f"\n--- Debugging {self.name} --- Min signals to converge: {self.min_signals_to_converge}")
+        if not self.strategies: 
+            print("No strategies provided to ConvergingSignalsStrategy.")
+            return pd.DataFrame(0, index=self.data.index, columns=['signal'])
+        
         all_signals_df = pd.DataFrame(index=self.data.index)
+        print("Individual strategy signals:")
         for i, strategy in enumerate(self.strategies):
             strategy_signals = strategy.generate_signals()
+            signal_col_name = f'signal_{strategy.name.replace(" ", "_")}'
             if not strategy_signals.empty:
-                 all_signals_df[f'signal_{strategy.name.replace(" ", "_")}'] = strategy_signals['signal']
+                all_signals_df[signal_col_name] = strategy_signals['signal']
+                # Print summary of individual strategy signals
+                print(f"  {strategy.name}: Buy signals: {(strategy_signals['signal'] == 1).sum()}, Sell signals: {(strategy_signals['signal'] == -1).sum()}")
             else: 
-                 all_signals_df[f'signal_{strategy.name.replace(" ", "_")}'] = 0
+                all_signals_df[signal_col_name] = 0
+                print(f"  {strategy.name}: No signals generated (empty DataFrame).")
 
         signals = pd.DataFrame(index=self.data.index)
         signals['signal'] = 0
         
-        if all_signals_df.empty: return signals
+        if all_signals_df.empty: 
+            print("all_signals_df is empty after collecting individual signals.")
+            return signals
+
+        print("\nCombined signals from all strategies (all_signals_df head):")
+        print(all_signals_df[(all_signals_df != 0).any(axis=1)].head())
 
         buy_convergence = (all_signals_df == 1).sum(axis=1)
         sell_convergence = (all_signals_df == -1).sum(axis=1)
         
+        print(f"\nTotal days with potential buy signals (any strategy): {(buy_convergence > 0).sum()}")
+        print(f"Total days with potential sell signals (any strategy): {(sell_convergence > 0).sum()}")
+
         signals.loc[buy_convergence >= self.min_signals_to_converge, 'signal'] = 1
         signals.loc[sell_convergence >= self.min_signals_to_converge, 'signal'] = -1
         
+        # Log how many convergence signals were generated before conflict resolution
+        initial_converged_buys = (signals['signal'] == 1).sum()
+        initial_converged_sells = (signals['signal'] == -1).sum()
+        print(f"Converged buy signals (before conflict resolution): {initial_converged_buys}")
+        print(f"Converged sell signals (before conflict resolution): {initial_converged_sells}")
+
         conflicting_days = (buy_convergence >= self.min_signals_to_converge) & \
                            (sell_convergence >= self.min_signals_to_converge)
         signals.loc[conflicting_days, 'signal'] = 0
         
+        print(f"Days with conflicting signals (resolved to 0): {conflicting_days.sum()}")
+        print(f"Final converged buy signals: {(signals['signal'] == 1).sum()}")
+        print(f"Final converged sell signals: {(signals['signal'] == -1).sum()}")
+        print("--- End Debugging ConvergingSignalsStrategy ---\n")
         return signals
 
 # --- 3. Backtesting Engine ---
@@ -657,18 +684,140 @@ if __name__ == "__main__":
         print("Could not run optimized RSI strategy as data was empty after indicator recalculation.")
 
 
-    print("\n--- Running Converging Signals Strategy ---")
-    rsi_for_converge = RsiStrategy(data_with_indicators_main, rsi_full_default_params)
-    macd_for_converge = MacdStrategy(data_with_indicators_main, base_indicator_params)
-    ma_for_converge = MaCrossStrategy(data_with_indicators_main, base_indicator_params)
-    converging_strat_list = [rsi_for_converge, macd_for_converge, ma_for_converge]
-    converging_params = {'min_signals_to_converge': 2}
-    converging_strategy = ConvergingSignalsStrategy(data_with_indicators_main, converging_strat_list, converging_params)
-    converging_signals = converging_strategy.generate_signals()
-    converging_portfolio, converging_tradelog = backtest_strategy(data_with_indicators_main, converging_signals, INITIAL_CAPITAL, TRANSACTION_FEE_PERCENT)
-    if not converging_portfolio.empty:
-        calculate_performance_metrics(converging_portfolio, RISK_FREE_RATE)
-        plot_results(converging_portfolio, data_with_indicators_main, converging_strategy.name, converging_signals, converging_tradelog)
+    # --- Optimizing MACD Strategy --- 
+    print("\n--- Optimizing MACD Strategy (Fast, Slow, Signal periods) ---")
+    macd_param_config_to_optimize = [
+        ('MACD_fast', 5, 20),      
+        ('MACD_slow', 21, 50),   
+        ('MACD_signal', 5, 15)  
+    ]
+    # Ensure MACD_fast < MACD_slow, objective_function handles errors if constraints violated by returning np.inf
+    macd_initial_logic_params_for_opt = {} # MACD params are indicator params
+    
+    optimized_macd_full_params = optimize_strategy_params(
+        raw_data_df=raw_df_main.copy(), 
+        strategy_class=MacdStrategy, 
+        param_config=macd_param_config_to_optimize,
+        initial_indicator_params=base_indicator_params.copy(), 
+        initial_strategy_logic_params=macd_initial_logic_params_for_opt,
+        metric_to_optimize="Sharpe Ratio"
+    )
+    
+    print("\n--- Running MACD Strategy with Fully Optimized Parameters ---")
+    data_for_optimized_macd_run = calculate_indicators(raw_df_main.copy(), optimized_macd_full_params) 
+    if not data_for_optimized_macd_run.empty:
+        optimized_macd_strat = MacdStrategy(data_for_optimized_macd_run, optimized_macd_full_params)
+        optimized_macd_signals = optimized_macd_strat.generate_signals()
+        optimized_macd_portfolio, optimized_macd_tradelog = backtest_strategy(data_for_optimized_macd_run, optimized_macd_signals, INITIAL_CAPITAL, TRANSACTION_FEE_PERCENT)
+        if not optimized_macd_portfolio.empty:
+            calculate_performance_metrics(optimized_macd_portfolio, RISK_FREE_RATE)
+            plot_results(optimized_macd_portfolio, data_for_optimized_macd_run, "Fully Optimized " + optimized_macd_strat.name, optimized_macd_signals, optimized_macd_tradelog)
+    else:
+        print("Could not run optimized MACD strategy as data was empty after indicator recalculation.")
+
+    # --- Optimizing MA Cross Strategy --- 
+    print("\n--- Optimizing MA Cross Strategy (Short and Long SMA periods) ---")
+    ma_param_config_to_optimize = [
+        ('SMA_short_period', 5, 40),      
+        ('SMA_long_period', 21, 100) # Start long period higher to ensure short < long
+    ]
+    # Ensure SMA_short_period < SMA_long_period, objective_function handles errors
+    ma_initial_logic_params_for_opt = {} # MA Cross params are indicator params
+
+    optimized_ma_cross_full_params = optimize_strategy_params(
+        raw_data_df=raw_df_main.copy(), 
+        strategy_class=MaCrossStrategy, 
+        param_config=ma_param_config_to_optimize,
+        initial_indicator_params=base_indicator_params.copy(),
+        initial_strategy_logic_params=ma_initial_logic_params_for_opt,
+        metric_to_optimize="Sharpe Ratio"
+    )
+
+    print("\n--- Running MA Cross Strategy with Fully Optimized Parameters ---")
+    data_for_optimized_ma_run = calculate_indicators(raw_df_main.copy(), optimized_ma_cross_full_params)
+    if not data_for_optimized_ma_run.empty:
+        optimized_ma_strat = MaCrossStrategy(data_for_optimized_ma_run, optimized_ma_cross_full_params)
+        optimized_ma_signals = optimized_ma_strat.generate_signals()
+        optimized_ma_portfolio, optimized_ma_tradelog = backtest_strategy(data_for_optimized_ma_run, optimized_ma_signals, INITIAL_CAPITAL, TRANSACTION_FEE_PERCENT)
+        if not optimized_ma_portfolio.empty:
+            calculate_performance_metrics(optimized_ma_portfolio, RISK_FREE_RATE)
+            plot_results(optimized_ma_portfolio, data_for_optimized_ma_run, "Fully Optimized " + optimized_ma_strat.name, optimized_ma_signals, optimized_ma_tradelog)
+    else:
+        print("Could not run optimized MA Cross strategy as data was empty after indicator recalculation.")
+
+    # --- Running Converging Signals Strategy (ALL components optimized) ---
+    print("\n--- Running Converging Signals Strategy (ALL components optimized) ---")
+    # Ensure all underlying data for optimization was successfully created
+    if not data_for_optimized_rsi_run.empty and not data_for_optimized_macd_run.empty and not data_for_optimized_ma_run.empty:
+        # 1. RSI Strategy with its optimized params and data
+        # data_for_optimized_rsi_run already calculated earlier
+        rsi_for_converge_fully_optimized = RsiStrategy(data_for_optimized_rsi_run, optimized_rsi_full_params)
+
+        # 2. MACD Strategy with its optimized params and data
+        # data_for_optimized_macd_run already calculated
+        macd_for_converge_fully_optimized = MacdStrategy(data_for_optimized_macd_run, optimized_macd_full_params)
+
+        # 3. MA Cross Strategy with its optimized params and data
+        # data_for_optimized_ma_run already calculated
+        ma_for_converge_fully_optimized = MaCrossStrategy(data_for_optimized_ma_run, optimized_ma_cross_full_params)
+
+        converging_strat_list_all_optimized = [
+            rsi_for_converge_fully_optimized, 
+            macd_for_converge_fully_optimized, 
+            ma_for_converge_fully_optimized
+        ]
+        converging_logic_params = {'min_signals_to_converge': 2} 
+        
+        # The ConvergingSignalsStrategy itself uses the raw_df for index, sub-strategies use their own data
+        converging_strategy_all_optimized = ConvergingSignalsStrategy(
+            raw_df_main.copy(), # Base data for index alignment
+            converging_strat_list_all_optimized, 
+            converging_logic_params
+        )
+        
+        print(f"Attempting to run: {converging_strategy_all_optimized.name} with all components optimized.")
+        converging_signals_all_optimized = converging_strategy_all_optimized.generate_signals()
+
+        # For backtesting and plotting the converging strategy, create a master data set
+        # This master set will use indicator parameters from each optimized strategy
+        master_indicator_params_for_convergence = base_indicator_params.copy()
+        master_indicator_params_for_convergence.update({
+            'RSI_period': optimized_rsi_full_params.get('RSI_period'),
+            'MACD_fast': optimized_macd_full_params.get('MACD_fast'),
+            'MACD_slow': optimized_macd_full_params.get('MACD_slow'),
+            'MACD_signal': optimized_macd_full_params.get('MACD_signal'),
+            'SMA_short_period': optimized_ma_cross_full_params.get('SMA_short_period'),
+            'SMA_long_period': optimized_ma_cross_full_params.get('SMA_long_period'),
+        })
+        # Remove None values if any param wasn't found (e.g. if optimization failed for a strategy)
+        master_indicator_params_for_convergence = {k: v for k, v in master_indicator_params_for_convergence.items() if v is not None}
+
+        data_for_converging_backtest_and_plot = calculate_indicators(raw_df_main.copy(), master_indicator_params_for_convergence)
+
+        if not data_for_converging_backtest_and_plot.empty and not converging_signals_all_optimized.empty:
+            converging_portfolio_all_optimized, converging_tradelog_all_optimized = backtest_strategy(
+                data_for_converging_backtest_and_plot, 
+                converging_signals_all_optimized, 
+                INITIAL_CAPITAL, 
+                TRANSACTION_FEE_PERCENT
+            )
+            
+            if not converging_portfolio_all_optimized.empty:
+                print(f"Performance for {converging_strategy_all_optimized.name} (all components optimized):")
+                calculate_performance_metrics(converging_portfolio_all_optimized, RISK_FREE_RATE)
+                plot_results(
+                    converging_portfolio_all_optimized, 
+                    data_for_converging_backtest_and_plot, 
+                    converging_strategy_all_optimized.name + " (All Opt)", 
+                    converging_signals_all_optimized, 
+                    converging_tradelog_all_optimized
+                )
+            else:
+                print(f"{converging_strategy_all_optimized.name} (all components optimized) did not generate any trades or the portfolio was empty.")
+        else:
+            print(f"Could not run backtest for {converging_strategy_all_optimized.name} due to empty data or signals.")
+    else:
+        print("Skipping fully optimized Converging Signals Strategy run because one or more component strategy data was empty after optimization.")
 
     print("\n--- Full Bot Script Execution Finished ---")
 
