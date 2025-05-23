@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import minimize, differential_evolution
+import time
 from collections import OrderedDict
 
 # --- Global Settings ---
@@ -536,26 +537,35 @@ def plot_results(portfolio_df, data_with_indicators, strategy_name, signals_df=N
 
 # --- 5. Parameter Optimization ---
 def objective_function(params_to_optimize_values, params_to_optimize_names, raw_data_for_opt, strategy_class, base_indicator_params_for_opt, base_strategy_logic_params, metric_to_optimize="Sharpe Ratio"):
+    obj_func_start_time = time.time()
+    
     current_trial_indicator_params = base_indicator_params_for_opt.copy()
     current_trial_strategy_logic_params = base_strategy_logic_params.copy()
 
+    param_dict_for_print = {}
     for name, value in zip(params_to_optimize_names, params_to_optimize_values):
         is_indicator_param = name.endswith("_period") or name.endswith("_window") or \
                              name.endswith("_fast") or name.endswith("_slow") or \
-                             name.endswith("_signal") or name == 'BB_std_dev' 
+                             name.endswith("_signal") or name == 'BB_std_dev'
         
         if is_indicator_param:
-            if name == 'BB_std_dev':
-                 current_trial_indicator_params[name] = value
-            else: 
-                 current_trial_indicator_params[name] = int(round(value))
-        else: 
+            rounded_value = int(round(value)) if name != 'BB_std_dev' else value
+            current_trial_indicator_params[name] = rounded_value
+            param_dict_for_print[name] = rounded_value
+        else:
             current_trial_strategy_logic_params[name] = value
+            param_dict_for_print[name] = value
             
+    # print(f"Objective func call with: {param_dict_for_print}") # Can be too verbose
+
     try:
-        data_for_trial = calculate_indicators(raw_data_for_opt.copy(), current_trial_indicator_params) 
+        calc_indicators_start_time = time.time()
+        data_for_trial = calculate_indicators(raw_data_for_opt.copy(), current_trial_indicator_params)
+        calc_indicators_time = time.time() - calc_indicators_start_time
+        
         if data_for_trial.empty:
-            return np.inf 
+            # print(f"Objective func: data_for_trial empty. Params: {param_dict_for_print}. Calc Ind Time: {calc_indicators_time:.4f}s. Total Time: {time.time() - obj_func_start_time:.4f}s. Returning inf.")
+            return np.inf
 
         full_strategy_params = {**current_trial_indicator_params, **current_trial_strategy_logic_params}
         
@@ -563,22 +573,27 @@ def objective_function(params_to_optimize_values, params_to_optimize_names, raw_
         signals = strategy_instance.generate_signals()
         
         common_idx = data_for_trial.index.intersection(signals.index)
-        if common_idx.empty: 
-            return np.inf 
+        if common_idx.empty:
+            # print(f"Objective func: common_idx empty. Params: {param_dict_for_print}. Calc Ind Time: {calc_indicators_time:.4f}s. Total Time: {time.time() - obj_func_start_time:.4f}s. Returning inf.")
+            return np.inf
 
+        backtest_start_time = time.time()
         portfolio_df, _ = backtest_strategy(data_for_trial.loc[common_idx], signals.loc[common_idx], INITIAL_CAPITAL, TRANSACTION_FEE_PERCENT)
-        if portfolio_df.empty: 
+        backtest_time = time.time() - backtest_start_time
+
+        if portfolio_df.empty:
+            # print(f"Objective func: portfolio_df empty. Params: {param_dict_for_print}. Calc Ind Time: {calc_indicators_time:.4f}s. Backtest Time: {backtest_time:.4f}s. Total Time: {time.time() - obj_func_start_time:.4f}s. Returning inf.")
             return np.inf
 
         metrics = calculate_performance_metrics(portfolio_df, RISK_FREE_RATE)
         value_to_optimize = metrics.get(metric_to_optimize, -np.inf if metric_to_optimize != "Max Drawdown" else np.inf)
         
-        if metric_to_optimize == "Max Drawdown": 
-            return abs(value_to_optimize) 
-        else: 
-            return -value_to_optimize 
+        result_val = abs(value_to_optimize) if metric_to_optimize == "Max Drawdown" else -value_to_optimize
+        # print(f"Objective func: Success. Params: {param_dict_for_print}. Metric '{metric_to_optimize}': {metrics.get(metric_to_optimize, 'N/A')}. Result: {result_val:.4f}. Calc Ind Time: {calc_indicators_time:.4f}s. Backtest Time: {backtest_time:.4f}s. Total Time: {time.time() - obj_func_start_time:.4f}s")
+        return result_val
             
     except Exception as e:
+        # print(f"Objective func: EXCEPTION '{e}' with params {param_dict_for_print}. Total Time: {time.time() - obj_func_start_time:.4f}s. Returning inf.")
         return np.inf 
 
 def optimize_strategy_params(raw_data_df, strategy_class, param_config, 
@@ -593,7 +608,7 @@ def optimize_strategy_params(raw_data_df, strategy_class, param_config,
         objective_function, bounds,
         args=(param_names, raw_data_df, strategy_class, 
               initial_indicator_params, initial_strategy_logic_params, metric_to_optimize),
-        strategy='best1bin', maxiter=30, popsize=10, tol=0.01, disp=True, polish=False
+        strategy='best1bin', maxiter=30, popsize=10, tol=0.01, disp=True, polish=False, workers=-1
     )
     
     optimized_param_values = result.x
