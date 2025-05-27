@@ -41,7 +41,15 @@ async def main():
     order_manager = OrderManager(execution_report_queue, htx_client)
     risk_manager = RiskManager(order_manager)
     data_handler = DataHandler(market_data_queue, strategy_input_queue)
-    strategy = OrderFlowImbalanceStrategy(strategy_input_queue, order_request_queue, risk_manager)
+    strategy = OrderFlowImbalanceStrategy(
+        symbol=config.TRADING_PAIR,
+        strategy_input_queue=strategy_input_queue,
+        order_queue=order_request_queue,
+        risk_manager=risk_manager,
+        imbalance_threshold=config.OFI_IMBALANCE_THRESHOLD,
+        order_size=config.OFI_ORDER_SIZE_ASSET,
+        cooldown_seconds=config.OFI_COOLDOWN_S
+    )
 
     # 2. Create asyncio Tasks for each component's run loop
     tasks.append(asyncio.create_task(htx_client.connect_public_ws()))
