@@ -1,10 +1,147 @@
-trading_bot/
-├── config.py           # Configuration (API keys, parameters)
-├── htx_client.py       # Handles HTX API communication (REST & WebSocket)
-├── data_handler.py     # Processes incoming market data
-├── strategy.py         # Implements the trading logic
-├── order_manager.py    # Tracks orders, positions, P&L
-├── risk_manager.py     # Enforces risk rules
-├── main.py             # Main application entry point
-└── utils.py            # Utility functions (e.g., logging setup)
-└── requirements.txt    # Python dependencies
+@startuml Trading Bot Project Structure
+
+' Core Components
+class Config {
+  + API_KEY: str
+  + API_SECRET: str
+  + BASE_URL: str
+  + SYMBOL: str
+  + __init__()
+  + load_config()
+}
+
+class HTXClient {
+  + base_url: str
+  + api_key: str
+  + api_secret: str
+  + __init__(api_key, api_secret, base_url)
+  + get_market_data(symbol: str) -> dict
+  + place_order(symbol: str, side: str, price: float, size: float) -> dict
+  + get_order_status(order_id: str) -> dict
+}
+
+class DataHandler {
+  + process_market_data(data: dict) -> dict
+  + calculate_metrics(data: dict) -> dict
+  + update_order_book(data: dict)
+}
+
+class Strategy {
+  <<interface>>
+  + generate_signal(data: dict) -> dict
+}
+
+class MovingAverageCrossoverStrategy {
+  - fast_ma: int
+  - slow_ma: int
+  + generate_signal(data: dict) -> dict
+}
+
+class OrderManager {
+  + position: float
+  + pnl: float
+  + execute_order(signal: dict) -> bool
+  + update_position(order_data: dict)
+  + get_pnl() -> float
+}
+
+class RiskManager {
+  + max_position: float
+  + max_drawdown: float
+  + check_risk(order: dict) -> bool
+  + update_risk_metrics()
+}
+
+class Backtester {
+  - strategy: Strategy
+  - data: pd.DataFrame
+  + run() -> dict
+  - _simulate_execution(signal: dict) -> bool
+  + get_performance_metrics() -> dict
+}
+
+class DataFetcher {
+  + fetch_data(symbol: str, start: str, end: str, interval: str) -> pd.DataFrame
+  + save_data(data: pd.DataFrame, filename: str)
+  + load_data(filename: str) -> pd.DataFrame
+}
+
+' Relationships
+HTXClient --> DataHandler : sends data to
+DataHandler --> Strategy : feeds data to
+Strategy --> OrderManager : sends signals to
+OrderManager --> RiskManager : checks with
+OrderManager --> HTXClient : places orders via
+Backtester --> Strategy : uses
+Backtester --> DataFetcher : gets data from
+
+' Main Application Flow
+class Main {
+  - config: Config
+  - client: HTXClient
+  - data_handler: DataHandler
+  - strategy: Strategy
+  - order_manager: OrderManager
+  - risk_manager: RiskManager
+  + run()
+}
+
+' Utility Classes
+class Utils {
+  + setup_logging()
+  + format_price(price: float) -> str
+  + get_timestamp() -> str
+}
+
+' External Dependencies
+package "External Libraries" {
+  [pandas]
+  [numpy]
+  [yfinance]
+  [websockets]
+  [aiohttp]
+  [python-dotenv]
+}
+
+' File Structure
+note left of Config
+  config.py
+end note
+
+note left of HTXClient
+  htx_client.py
+end note
+
+note left of DataHandler
+  data_handler.py
+end note
+
+note left of Strategy
+  strategy.py
+end note
+
+note left of OrderManager
+  order_manager.py
+end note
+
+note left of RiskManager
+  risk_manager.py
+end note
+
+note left of Backtester
+  backtester.py
+end note
+
+note left of DataFetcher
+  data_fetcher.py
+end note
+
+note left of Main
+  main.py
+end note
+
+note left of Utils
+  utils.py
+end note
+
+@enduml

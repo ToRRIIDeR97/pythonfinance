@@ -1,0 +1,130 @@
+@startuml
+' skinparam style strictuml
+title Trading Bot UML Diagram
+
+package "Configuration" {
+  class Config {
+    + API_KEY: str
+    + API_SECRET: str
+    + SYMBOLS: list
+    + OFI_THRESHOLD: float
+    + MA_SHORT_WINDOW: int
+    + MA_LONG_WINDOW: int
+    --
+    + load_config()
+  }
+}
+
+package "ExchangeClient" {
+  class HTXClient {
+    - api_key: str
+    - api_secret: str
+    --
+    + __init__(api_key, api_secret)
+    + get_order_book(symbol): dict
+    + place_order(symbol, type, side, amount, price): dict
+    + cancel_order(order_id): dict
+    + get_account_balance(): dict
+  }
+}
+
+package "DataHandling" {
+  class DataFetcher {
+    + fetch_historical_data(symbol, start_date, end_date): DataFrame
+  }
+
+  class DataHandler {
+    - htx_client: HTXClient
+    - N_levels: int
+    --
+    + __init__(htx_client, N_levels)
+    + get_market_data(symbol): dict
+    + calculate_ofi(order_book_data): float
+  }
+}
+
+package "Strategy" {
+  interface Strategy {
+    + generate_signal(data): str
+  }
+
+  class OFIStrategy implements Strategy {
+    - ofi_threshold: float
+    --
+    + __init__(ofi_threshold)
+    + generate_signal(ofi_value): str
+  }
+
+  class MovingAverageCrossoverStrategy implements Strategy {
+    - short_window: int
+    - long_window: int
+    --
+    + __init__(short_window, long_window)
+    + generate_signal(historical_data): str
+  }
+}
+
+package "OrderManagement" {
+  class OrderManager {
+    - htx_client: HTXClient
+    --
+    + __init__(htx_client)
+    + execute_order(signal, symbol, amount, price)
+    + track_orders()
+  }
+}
+
+package "RiskManagement" {
+  class RiskManager {
+    - max_position_size: float
+    - max_drawdown: float
+    --
+    + __init__(max_position_size, max_drawdown)
+    + check_pre_trade_risk(order_details): bool
+    + monitor_portfolio_risk(portfolio_value)
+  }
+}
+
+package "Backtesting" {
+  class Backtester {
+    - strategy: Strategy
+    - historical_data: DataFrame
+    - initial_capital: float
+    - trades: list
+    - portfolio_value: float
+    --
+    + __init__(strategy, historical_data, initial_capital)
+    + run_backtest()
+    + _simulate_execution(timestamp, signal, price)
+    + calculate_performance_metrics(): dict
+    + print_summary()
+  }
+}
+
+package "Application" {
+  class Main {
+    ' Entry point logic
+    + run_live_trading()
+    + run_backtesting_mode()
+  }
+}
+
+' Relationships
+Main --> Config : uses
+Main --> HTXClient : creates/uses
+Main --> DataHandler : creates/uses
+Main --> OrderManager : creates/uses
+Main --> RiskManager : creates/uses
+Main --> OFIStrategy : creates/uses
+Main --> MovingAverageCrossoverStrategy : creates/uses
+Main --> Backtester : creates/uses
+Main --> DataFetcher : creates/uses
+
+DataHandler ..> HTXClient : uses
+OrderManager ..> HTXClient : uses
+OFIStrategy ..> DataHandler : uses (indirectly for OFI value)
+
+Backtester *-- Strategy : uses
+Backtester ..> DataFetcher : uses (for data)
+
+@enduml

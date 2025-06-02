@@ -553,3 +553,259 @@ Name: 2022-01-30 00:00:00, dtype: float64
 2025-05-23 16:54:55,978 - TradingBot - INFO -   2023-06-22: BUY 0.1 BTC-USD at 29912.28 (Cost: 2991.23)
 2025-05-23 16:54:55,979 - TradingBot - INFO -   2023-07-20: SELL 0.1 BTC-USD at 29792.02 (Proceeds: 2979.20)
 2025-05-23 16:54:55,979 - TradingBot - INFO -   2023-09-18: BUY 0.1 BTC-USD at 26754.28 (Cost: 2675.43)
+2025-05-30 15:17:11,354 - TradingBot - INFO - Setting up Moving Average Crossover backtest...
+2025-05-30 15:17:11,355 - TradingBot - INFO - Fetching historical data for BTC-USD from 2022-01-01 to 2023-12-31 with interval 1d.
+2025-05-30 15:17:11,528 - TradingBot - INFO - Successfully fetched 729 data points for BTC-USD.
+2025-05-30 15:17:11,529 - TradingBot - INFO - Starting backtest for strategy MovingAverageCrossoverStrategy on BTC-USD
+2025-05-30 15:17:11,529 - TradingBot - INFO - Initial capital: $100000.00
+2025-05-30 15:17:11,538 - TradingBot - INFO - [BTC-USD] BUY Signal: Short MA (40256.48) crossed above Long MA (40046.34) at 44118.45 on 2022-02-08. Position before: 0
+2025-05-30 15:17:11,538 - TradingBot - INFO - [2022-02-08] Attempting to execute: buy 0.1 BTC-USD at ~44118.45
+2025-05-30 15:17:11,538 - TradingBot - INFO -     Executed BUY: 0.1 BTC-USD at 44118.45. Cost: 4411.84. Capital: 95588.16
+2025-05-30 15:17:11,544 - TradingBot - INFO - [BTC-USD] SELL Signal: Short MA (39865.01) crossed below Long MA (40282.28) at 38332.61 on 2022-02-24. Position before: 1
+2025-05-30 15:17:11,544 - TradingBot - INFO - [2022-02-24] Attempting to execute: sell 0.1 BTC-USD at ~38332.61
+2025-05-30 15:17:11,544 - TradingBot - INFO -     Executed SELL: 0.1 BTC-USD at 38332.61. Proceeds: 3833.26. Capital: 99421.42
+2025-05-30 15:17:11,548 - TradingBot - INFO - [BTC-USD] BUY Signal: Short MA (40966.42) crossed above Long MA (40860.09) at 41982.93 on 2022-03-09. Position before: -1
+2025-05-30 15:17:11,548 - TradingBot - INFO - [2022-03-09] Attempting to execute: buy 0.1 BTC-USD at ~41982.93
+2025-05-30 15:17:11,548 - TradingBot - INFO -     Executed BUY: 0.1 BTC-USD at 41982.93. Cost: 4198.29. Capital: 95223.12
+2025-05-30 15:17:11,549 - TradingBot - INFO - [BTC-USD] SELL Signal: Short MA (40590.84) crossed below Long MA (40704.05) at 39437.46 on 2022-03-10. Position before: 1
+2025-05-30 15:17:11,549 - TradingBot - INFO - [2022-03-10] Attempting to execute: sell 0.1 BTC-USD at ~39437.46
+2025-05-30 15:17:11,549 - TradingBot - INFO -     Executed SELL: 0.1 BTC-USD at 39437.46. Proceeds: 3943.75. Capital: 99166.87
+2025-05-30 15:17:11,552 - TradingBot - INFO - [BTC-USD] BUY Signal: Short MA (39987.10) crossed above Long MA (39789.82) at 41801.16 on 2022-03-18. Position before: -1
+2025-05-30 15:17:11,552 - TradingBot - INFO - [2022-03-18] Attempting to execute: buy 0.1 BTC-USD at ~41801.16
+2025-05-30 15:17:11,552 - TradingBot - INFO -     Executed BUY: 0.1 BTC-USD at 41801.16. Cost: 4180.12. Capital: 94986.75
+2025-05-30 15:17:11,560 - TradingBot - INFO - [BTC-USD] SELL Signal: Short MA (43226.94) crossed below Long MA (43463.88) at 40127.18 on 2022-04-12. Position before: 1
+2025-05-30 15:17:11,560 - TradingBot - INFO - [2022-04-12] Attempting to execute: sell 0.1 BTC-USD at ~40127.18
+2025-05-30 15:17:11,560 - TradingBot - INFO -     Executed SELL: 0.1 BTC-USD at 40127.18. Proceeds: 4012.72. Capital: 98999.47
+2025-05-30 15:17:11,575 - TradingBot - INFO - [BTC-USD] BUY Signal: Short MA (30286.08) crossed above Long MA (30046.84) at 31370.67 on 2022-06-06. Position before: -1
+2025-05-30 15:17:11,575 - TradingBot - INFO - [2022-06-06] Attempting to execute: buy 0.1 BTC-USD at ~31370.67
+2025-05-30 15:17:11,575 - TradingBot - INFO -     Executed BUY: 0.1 BTC-USD at 31370.67. Cost: 3137.07. Capital: 95862.41
+2025-05-30 15:17:11,577 - TradingBot - INFO - [BTC-USD] SELL Signal: Short MA (29650.37) crossed below Long MA (29814.93) at 26762.65 on 2022-06-12. Position before: 1
+2025-05-30 15:17:11,577 - TradingBot - INFO - [2022-06-12] Attempting to execute: sell 0.1 BTC-USD at ~26762.65
+2025-05-30 15:17:11,577 - TradingBot - INFO -     Executed SELL: 0.1 BTC-USD at 26762.65. Proceeds: 2676.26. Capital: 98538.67
+2025-05-30 15:17:11,585 - TradingBot - INFO - [BTC-USD] BUY Signal: Short MA (20629.75) crossed above Long MA (20545.30) at 20212.07 on 2022-07-13. Position before: -1
+2025-05-30 15:17:11,585 - TradingBot - INFO - [2022-07-13] Attempting to execute: buy 0.1 BTC-USD at ~20212.07
+2025-05-30 15:17:11,585 - TradingBot - INFO -     Executed BUY: 0.1 BTC-USD at 20212.07. Cost: 2021.21. Capital: 96517.46
+2025-05-30 15:17:11,597 - TradingBot - INFO - [BTC-USD] SELL Signal: Short MA (22828.90) crossed below Long MA (23051.66) at 21398.91 on 2022-08-22. Position before: 1
+2025-05-30 15:17:11,597 - TradingBot - INFO - [2022-08-22] Attempting to execute: sell 0.1 BTC-USD at ~21398.91
+2025-05-30 15:17:11,597 - TradingBot - INFO -     Executed SELL: 0.1 BTC-USD at 21398.91. Proceeds: 2139.89. Capital: 98657.35
+2025-05-30 15:17:11,604 - TradingBot - INFO - [BTC-USD] BUY Signal: Short MA (20583.31) crossed above Long MA (20572.51) at 19772.58 on 2022-09-16. Position before: -1
+2025-05-30 15:17:11,604 - TradingBot - INFO - [2022-09-16] Attempting to execute: buy 0.1 BTC-USD at ~19772.58
+2025-05-30 15:17:11,604 - TradingBot - INFO -     Executed BUY: 0.1 BTC-USD at 19772.58. Cost: 1977.26. Capital: 96680.10
+2025-05-30 15:17:11,605 - TradingBot - INFO - [BTC-USD] SELL Signal: Short MA (20213.33) crossed below Long MA (20278.90) at 18890.79 on 2022-09-20. Position before: 1
+2025-05-30 15:17:11,605 - TradingBot - INFO - [2022-09-20] Attempting to execute: sell 0.1 BTC-USD at ~18890.79
+2025-05-30 15:17:11,605 - TradingBot - INFO -     Executed SELL: 0.1 BTC-USD at 18890.79. Proceeds: 1889.08. Capital: 98569.17
+2025-05-30 15:17:11,610 - TradingBot - INFO - [BTC-USD] BUY Signal: Short MA (19572.34) crossed above Long MA (19572.07) at 19051.42 on 2022-10-11. Position before: -1
+2025-05-30 15:17:11,610 - TradingBot - INFO - [2022-10-11] Attempting to execute: buy 0.1 BTC-USD at ~19051.42
+2025-05-30 15:17:11,610 - TradingBot - INFO -     Executed BUY: 0.1 BTC-USD at 19051.42. Cost: 1905.14. Capital: 96664.03
+2025-05-30 15:17:11,612 - TradingBot - INFO - [BTC-USD] SELL Signal: Short MA (19335.18) crossed below Long MA (19378.21) at 19067.63 on 2022-10-15. Position before: 1
+2025-05-30 15:17:11,612 - TradingBot - INFO - [2022-10-15] Attempting to execute: sell 0.1 BTC-USD at ~19067.63
+2025-05-30 15:17:11,612 - TradingBot - INFO -     Executed SELL: 0.1 BTC-USD at 19067.63. Proceeds: 1906.76. Capital: 98570.80
+2025-05-30 15:17:11,614 - TradingBot - INFO - [BTC-USD] BUY Signal: Short MA (19523.80) crossed above Long MA (19462.58) at 20770.44 on 2022-10-26. Position before: -1
+2025-05-30 15:17:11,614 - TradingBot - INFO - [2022-10-26] Attempting to execute: buy 0.1 BTC-USD at ~20770.44
+2025-05-30 15:17:11,614 - TradingBot - INFO -     Executed BUY: 0.1 BTC-USD at 20770.44. Cost: 2077.04. Capital: 96493.75
+2025-05-30 15:17:11,619 - TradingBot - INFO - [BTC-USD] SELL Signal: Short MA (19682.28) crossed below Long MA (19698.45) at 17586.77 on 2022-11-10. Position before: 1
+2025-05-30 15:17:11,619 - TradingBot - INFO - [2022-11-10] Attempting to execute: sell 0.1 BTC-USD at ~17586.77
+2025-05-30 15:17:11,619 - TradingBot - INFO -     Executed SELL: 0.1 BTC-USD at 17586.77. Proceeds: 1758.68. Capital: 98252.43
+2025-05-30 15:17:11,625 - TradingBot - INFO - [BTC-USD] BUY Signal: Short MA (16883.78) crossed above Long MA (16740.58) at 16848.13 on 2022-12-07. Position before: -1
+2025-05-30 15:17:11,625 - TradingBot - INFO - [2022-12-07] Attempting to execute: buy 0.1 BTC-USD at ~16848.13
+2025-05-30 15:17:11,625 - TradingBot - INFO -     Executed BUY: 0.1 BTC-USD at 16848.13. Cost: 1684.81. Capital: 96567.62
+2025-05-30 15:17:11,629 - TradingBot - INFO - [BTC-USD] SELL Signal: Short MA (16917.19) crossed below Long MA (16921.07) at 16796.95 on 2022-12-23. Position before: 1
+2025-05-30 15:17:11,630 - TradingBot - INFO - [2022-12-23] Attempting to execute: sell 0.1 BTC-USD at ~16796.95
+2025-05-30 15:17:11,630 - TradingBot - INFO -     Executed SELL: 0.1 BTC-USD at 16796.95. Proceeds: 1679.70. Capital: 98247.31
+2025-05-30 15:17:11,634 - TradingBot - INFO - [BTC-USD] BUY Signal: Short MA (16933.44) crossed above Long MA (16905.53) at 17446.29 on 2023-01-10. Position before: -1
+2025-05-30 15:17:11,634 - TradingBot - INFO - [2023-01-10] Attempting to execute: buy 0.1 BTC-USD at ~17446.29
+2025-05-30 15:17:11,634 - TradingBot - INFO -     Executed BUY: 0.1 BTC-USD at 17446.29. Cost: 1744.63. Capital: 96502.68
+2025-05-30 15:17:11,643 - TradingBot - INFO - [BTC-USD] SELL Signal: Short MA (22418.87) crossed below Long MA (22519.37) at 21808.10 on 2023-02-13. Position before: 1
+2025-05-30 15:17:11,643 - TradingBot - INFO - [2023-02-13] Attempting to execute: sell 0.1 BTC-USD at ~21808.10
+2025-05-30 15:17:11,643 - TradingBot - INFO -     Executed SELL: 0.1 BTC-USD at 21808.10. Proceeds: 2180.81. Capital: 98683.49
+2025-05-30 15:17:11,645 - TradingBot - INFO - [BTC-USD] BUY Signal: Short MA (23080.50) crossed above Long MA (23053.46) at 24327.64 on 2023-02-19. Position before: -1
+2025-05-30 15:17:11,645 - TradingBot - INFO - [2023-02-19] Attempting to execute: buy 0.1 BTC-USD at ~24327.64
+2025-05-30 15:17:11,645 - TradingBot - INFO -     Executed BUY: 0.1 BTC-USD at 24327.64. Cost: 2432.76. Capital: 96250.73
+2025-05-30 15:17:11,649 - TradingBot - INFO - [BTC-USD] SELL Signal: Short MA (23087.85) crossed below Long MA (23205.19) at 22435.51 on 2023-03-05. Position before: 1
+2025-05-30 15:17:11,649 - TradingBot - INFO - [2023-03-05] Attempting to execute: sell 0.1 BTC-USD at ~22435.51
+2025-05-30 15:17:11,649 - TradingBot - INFO -     Executed SELL: 0.1 BTC-USD at 22435.51. Proceeds: 2243.55. Capital: 98494.28
+2025-05-30 15:17:11,654 - TradingBot - INFO - [BTC-USD] BUY Signal: Short MA (23610.88) crossed above Long MA (23476.38) at 26965.88 on 2023-03-18. Position before: -1
+2025-05-30 15:17:11,654 - TradingBot - INFO - [2023-03-18] Attempting to execute: buy 0.1 BTC-USD at ~26965.88
+2025-05-30 15:17:11,654 - TradingBot - INFO -     Executed BUY: 0.1 BTC-USD at 26965.88. Cost: 2696.59. Capital: 95797.69
+2025-05-30 15:17:11,665 - TradingBot - INFO - [BTC-USD] SELL Signal: Short MA (28574.54) crossed below Long MA (28641.39) at 28307.60 on 2023-04-25. Position before: 1
+2025-05-30 15:17:11,666 - TradingBot - INFO - [2023-04-25] Attempting to execute: sell 0.1 BTC-USD at ~28307.60
+2025-05-30 15:17:11,666 - TradingBot - INFO -     Executed SELL: 0.1 BTC-USD at 28307.60. Proceeds: 2830.76. Capital: 98628.45
+2025-05-30 15:17:11,668 - TradingBot - INFO - [BTC-USD] BUY Signal: Short MA (28991.46) crossed above Long MA (28971.37) at 29534.38 on 2023-05-05. Position before: -1
+2025-05-30 15:17:11,668 - TradingBot - INFO - [2023-05-05] Attempting to execute: buy 0.1 BTC-USD at ~29534.38
+2025-05-30 15:17:11,668 - TradingBot - INFO -     Executed BUY: 0.1 BTC-USD at 29534.38. Cost: 2953.44. Capital: 95675.01
+2025-05-30 15:17:11,669 - TradingBot - INFO - [BTC-USD] SELL Signal: Short MA (28937.77) crossed below Long MA (29017.69) at 28454.98 on 2023-05-07. Position before: 1
+2025-05-30 15:17:11,669 - TradingBot - INFO - [2023-05-07] Attempting to execute: sell 0.1 BTC-USD at ~28454.98
+2025-05-30 15:17:11,669 - TradingBot - INFO -     Executed SELL: 0.1 BTC-USD at 28454.98. Proceeds: 2845.50. Capital: 98520.51
+2025-05-30 15:17:11,676 - TradingBot - INFO - [BTC-USD] BUY Signal: Short MA (27260.49) crossed above Long MA (27219.39) at 27119.07 on 2023-06-04. Position before: -1
+2025-05-30 15:17:11,676 - TradingBot - INFO - [2023-06-04] Attempting to execute: buy 0.1 BTC-USD at ~27119.07
+2025-05-30 15:17:11,676 - TradingBot - INFO -     Executed BUY: 0.1 BTC-USD at 27119.07. Cost: 2711.91. Capital: 95808.60
+2025-05-30 15:17:11,677 - TradingBot - INFO - [BTC-USD] SELL Signal: Short MA (27027.65) crossed below Long MA (27029.09) at 26346.00 on 2023-06-07. Position before: 1
+2025-05-30 15:17:11,677 - TradingBot - INFO - [2023-06-07] Attempting to execute: sell 0.1 BTC-USD at ~26346.00
+2025-05-30 15:17:11,677 - TradingBot - INFO -     Executed SELL: 0.1 BTC-USD at 26346.00. Proceeds: 2634.60. Capital: 98443.20
+2025-05-30 15:17:11,680 - TradingBot - INFO - [BTC-USD] BUY Signal: Short MA (27091.22) crossed above Long MA (26878.52) at 29912.28 on 2023-06-22. Position before: -1
+2025-05-30 15:17:11,681 - TradingBot - INFO - [2023-06-22] Attempting to execute: buy 0.1 BTC-USD at ~29912.28
+2025-05-30 15:17:11,681 - TradingBot - INFO -     Executed BUY: 0.1 BTC-USD at 29912.28. Cost: 2991.23. Capital: 95451.98
+2025-05-30 15:17:11,688 - TradingBot - INFO - [BTC-USD] SELL Signal: Short MA (30307.60) crossed below Long MA (30383.24) at 29792.02 on 2023-07-20. Position before: 1
+2025-05-30 15:17:11,688 - TradingBot - INFO - [2023-07-20] Attempting to execute: sell 0.1 BTC-USD at ~29792.02
+2025-05-30 15:17:11,688 - TradingBot - INFO -     Executed SELL: 0.1 BTC-USD at 29792.02. Proceeds: 2979.20. Capital: 98431.18
+2025-05-30 15:17:11,703 - TradingBot - INFO - [BTC-USD] BUY Signal: Short MA (26195.73) crossed above Long MA (26174.51) at 26754.28 on 2023-09-18. Position before: -1
+2025-05-30 15:17:11,703 - TradingBot - INFO - [2023-09-18] Attempting to execute: buy 0.1 BTC-USD at ~26754.28
+2025-05-30 15:17:11,703 - TradingBot - INFO -     Executed BUY: 0.1 BTC-USD at 26754.28. Cost: 2675.43. Capital: 95755.75
+2025-05-30 15:17:11,732 - TradingBot - INFO - Backtest finished.
+2025-05-30 15:21:44,991 - TradingBot - INFO - Setting up Moving Average Crossover backtest...
+2025-05-30 15:21:44,992 - TradingBot - INFO - Fetching historical data for BTC-USD from 2022-01-01 to 2023-12-31 with interval 1d.
+2025-05-30 15:21:45,152 - TradingBot - INFO - Successfully fetched 729 data points for BTC-USD.
+2025-05-30 15:21:45,152 - TradingBot - INFO - Starting backtest for strategy MovingAverageCrossoverStrategy on BTC-USD
+2025-05-30 15:21:45,152 - TradingBot - INFO - Initial capital: $100000.00
+2025-05-30 15:21:45,162 - TradingBot - INFO - [BTC-USD] BUY Signal: Short MA (40256.48) crossed above Long MA (40046.34) at 44118.45 on 2022-02-08. Position before: 0
+2025-05-30 15:21:45,162 - TradingBot - INFO - [2022-02-08] Attempting to execute: buy 0.1 BTC-USD at ~44118.45
+2025-05-30 15:21:45,162 - TradingBot - INFO -     Executed BUY: 0.1 BTC-USD at 44118.45. Cost: 4411.84. Capital: 95588.16
+2025-05-30 15:21:45,168 - TradingBot - INFO - [BTC-USD] SELL Signal: Short MA (39865.01) crossed below Long MA (40282.28) at 38332.61 on 2022-02-24. Position before: 1
+2025-05-30 15:21:45,168 - TradingBot - INFO - [2022-02-24] Attempting to execute: sell 0.1 BTC-USD at ~38332.61
+2025-05-30 15:21:45,168 - TradingBot - INFO -     Executed SELL: 0.1 BTC-USD at 38332.61. Proceeds: 3833.26. Capital: 99421.42
+2025-05-30 15:21:45,172 - TradingBot - INFO - [BTC-USD] BUY Signal: Short MA (40966.42) crossed above Long MA (40860.09) at 41982.93 on 2022-03-09. Position before: -1
+2025-05-30 15:21:45,172 - TradingBot - INFO - [2022-03-09] Attempting to execute: buy 0.1 BTC-USD at ~41982.93
+2025-05-30 15:21:45,172 - TradingBot - INFO -     Executed BUY: 0.1 BTC-USD at 41982.93. Cost: 4198.29. Capital: 95223.12
+2025-05-30 15:21:45,172 - TradingBot - INFO - [BTC-USD] SELL Signal: Short MA (40590.84) crossed below Long MA (40704.05) at 39437.46 on 2022-03-10. Position before: 1
+2025-05-30 15:21:45,172 - TradingBot - INFO - [2022-03-10] Attempting to execute: sell 0.1 BTC-USD at ~39437.46
+2025-05-30 15:21:45,173 - TradingBot - INFO -     Executed SELL: 0.1 BTC-USD at 39437.46. Proceeds: 3943.75. Capital: 99166.87
+2025-05-30 15:21:45,175 - TradingBot - INFO - [BTC-USD] BUY Signal: Short MA (39987.10) crossed above Long MA (39789.82) at 41801.16 on 2022-03-18. Position before: -1
+2025-05-30 15:21:45,175 - TradingBot - INFO - [2022-03-18] Attempting to execute: buy 0.1 BTC-USD at ~41801.16
+2025-05-30 15:21:45,175 - TradingBot - INFO -     Executed BUY: 0.1 BTC-USD at 41801.16. Cost: 4180.12. Capital: 94986.75
+2025-05-30 15:21:45,183 - TradingBot - INFO - [BTC-USD] SELL Signal: Short MA (43226.94) crossed below Long MA (43463.88) at 40127.18 on 2022-04-12. Position before: 1
+2025-05-30 15:21:45,183 - TradingBot - INFO - [2022-04-12] Attempting to execute: sell 0.1 BTC-USD at ~40127.18
+2025-05-30 15:21:45,183 - TradingBot - INFO -     Executed SELL: 0.1 BTC-USD at 40127.18. Proceeds: 4012.72. Capital: 98999.47
+2025-05-30 15:21:45,197 - TradingBot - INFO - [BTC-USD] BUY Signal: Short MA (30286.08) crossed above Long MA (30046.84) at 31370.67 on 2022-06-06. Position before: -1
+2025-05-30 15:21:45,198 - TradingBot - INFO - [2022-06-06] Attempting to execute: buy 0.1 BTC-USD at ~31370.67
+2025-05-30 15:21:45,198 - TradingBot - INFO -     Executed BUY: 0.1 BTC-USD at 31370.67. Cost: 3137.07. Capital: 95862.41
+2025-05-30 15:21:45,200 - TradingBot - INFO - [BTC-USD] SELL Signal: Short MA (29650.37) crossed below Long MA (29814.93) at 26762.65 on 2022-06-12. Position before: 1
+2025-05-30 15:21:45,200 - TradingBot - INFO - [2022-06-12] Attempting to execute: sell 0.1 BTC-USD at ~26762.65
+2025-05-30 15:21:45,200 - TradingBot - INFO -     Executed SELL: 0.1 BTC-USD at 26762.65. Proceeds: 2676.26. Capital: 98538.67
+2025-05-30 15:21:45,208 - TradingBot - INFO - [BTC-USD] BUY Signal: Short MA (20629.75) crossed above Long MA (20545.30) at 20212.07 on 2022-07-13. Position before: -1
+2025-05-30 15:21:45,209 - TradingBot - INFO - [2022-07-13] Attempting to execute: buy 0.1 BTC-USD at ~20212.07
+2025-05-30 15:21:45,209 - TradingBot - INFO -     Executed BUY: 0.1 BTC-USD at 20212.07. Cost: 2021.21. Capital: 96517.46
+2025-05-30 15:21:45,221 - TradingBot - INFO - [BTC-USD] SELL Signal: Short MA (22828.90) crossed below Long MA (23051.66) at 21398.91 on 2022-08-22. Position before: 1
+2025-05-30 15:21:45,221 - TradingBot - INFO - [2022-08-22] Attempting to execute: sell 0.1 BTC-USD at ~21398.91
+2025-05-30 15:21:45,221 - TradingBot - INFO -     Executed SELL: 0.1 BTC-USD at 21398.91. Proceeds: 2139.89. Capital: 98657.35
+2025-05-30 15:21:45,227 - TradingBot - INFO - [BTC-USD] BUY Signal: Short MA (20583.31) crossed above Long MA (20572.51) at 19772.58 on 2022-09-16. Position before: -1
+2025-05-30 15:21:45,227 - TradingBot - INFO - [2022-09-16] Attempting to execute: buy 0.1 BTC-USD at ~19772.58
+2025-05-30 15:21:45,227 - TradingBot - INFO -     Executed BUY: 0.1 BTC-USD at 19772.58. Cost: 1977.26. Capital: 96680.10
+2025-05-30 15:21:45,228 - TradingBot - INFO - [BTC-USD] SELL Signal: Short MA (20213.33) crossed below Long MA (20278.90) at 18890.79 on 2022-09-20. Position before: 1
+2025-05-30 15:21:45,228 - TradingBot - INFO - [2022-09-20] Attempting to execute: sell 0.1 BTC-USD at ~18890.79
+2025-05-30 15:21:45,228 - TradingBot - INFO -     Executed SELL: 0.1 BTC-USD at 18890.79. Proceeds: 1889.08. Capital: 98569.17
+2025-05-30 15:21:45,233 - TradingBot - INFO - [BTC-USD] BUY Signal: Short MA (19572.34) crossed above Long MA (19572.07) at 19051.42 on 2022-10-11. Position before: -1
+2025-05-30 15:21:45,233 - TradingBot - INFO - [2022-10-11] Attempting to execute: buy 0.1 BTC-USD at ~19051.42
+2025-05-30 15:21:45,233 - TradingBot - INFO -     Executed BUY: 0.1 BTC-USD at 19051.42. Cost: 1905.14. Capital: 96664.03
+2025-05-30 15:21:45,234 - TradingBot - INFO - [BTC-USD] SELL Signal: Short MA (19335.18) crossed below Long MA (19378.21) at 19067.63 on 2022-10-15. Position before: 1
+2025-05-30 15:21:45,235 - TradingBot - INFO - [2022-10-15] Attempting to execute: sell 0.1 BTC-USD at ~19067.63
+2025-05-30 15:21:45,235 - TradingBot - INFO -     Executed SELL: 0.1 BTC-USD at 19067.63. Proceeds: 1906.76. Capital: 98570.80
+2025-05-30 15:21:45,237 - TradingBot - INFO - [BTC-USD] BUY Signal: Short MA (19523.80) crossed above Long MA (19462.58) at 20770.44 on 2022-10-26. Position before: -1
+2025-05-30 15:21:45,237 - TradingBot - INFO - [2022-10-26] Attempting to execute: buy 0.1 BTC-USD at ~20770.44
+2025-05-30 15:21:45,237 - TradingBot - INFO -     Executed BUY: 0.1 BTC-USD at 20770.44. Cost: 2077.04. Capital: 96493.75
+2025-05-30 15:21:45,242 - TradingBot - INFO - [BTC-USD] SELL Signal: Short MA (19682.28) crossed below Long MA (19698.45) at 17586.77 on 2022-11-10. Position before: 1
+2025-05-30 15:21:45,242 - TradingBot - INFO - [2022-11-10] Attempting to execute: sell 0.1 BTC-USD at ~17586.77
+2025-05-30 15:21:45,242 - TradingBot - INFO -     Executed SELL: 0.1 BTC-USD at 17586.77. Proceeds: 1758.68. Capital: 98252.43
+2025-05-30 15:21:45,250 - TradingBot - INFO - [BTC-USD] BUY Signal: Short MA (16883.78) crossed above Long MA (16740.58) at 16848.13 on 2022-12-07. Position before: -1
+2025-05-30 15:21:45,250 - TradingBot - INFO - [2022-12-07] Attempting to execute: buy 0.1 BTC-USD at ~16848.13
+2025-05-30 15:21:45,250 - TradingBot - INFO -     Executed BUY: 0.1 BTC-USD at 16848.13. Cost: 1684.81. Capital: 96567.62
+2025-05-30 15:21:45,255 - TradingBot - INFO - [BTC-USD] SELL Signal: Short MA (16917.19) crossed below Long MA (16921.07) at 16796.95 on 2022-12-23. Position before: 1
+2025-05-30 15:21:45,255 - TradingBot - INFO - [2022-12-23] Attempting to execute: sell 0.1 BTC-USD at ~16796.95
+2025-05-30 15:21:45,255 - TradingBot - INFO -     Executed SELL: 0.1 BTC-USD at 16796.95. Proceeds: 1679.70. Capital: 98247.31
+2025-05-30 15:21:45,259 - TradingBot - INFO - [BTC-USD] BUY Signal: Short MA (16933.44) crossed above Long MA (16905.53) at 17446.29 on 2023-01-10. Position before: -1
+2025-05-30 15:21:45,259 - TradingBot - INFO - [2023-01-10] Attempting to execute: buy 0.1 BTC-USD at ~17446.29
+2025-05-30 15:21:45,259 - TradingBot - INFO -     Executed BUY: 0.1 BTC-USD at 17446.29. Cost: 1744.63. Capital: 96502.68
+2025-05-30 15:21:45,269 - TradingBot - INFO - [BTC-USD] SELL Signal: Short MA (22418.87) crossed below Long MA (22519.37) at 21808.10 on 2023-02-13. Position before: 1
+2025-05-30 15:21:45,269 - TradingBot - INFO - [2023-02-13] Attempting to execute: sell 0.1 BTC-USD at ~21808.10
+2025-05-30 15:21:45,269 - TradingBot - INFO -     Executed SELL: 0.1 BTC-USD at 21808.10. Proceeds: 2180.81. Capital: 98683.49
+2025-05-30 15:21:45,270 - TradingBot - INFO - [BTC-USD] BUY Signal: Short MA (23080.50) crossed above Long MA (23053.46) at 24327.64 on 2023-02-19. Position before: -1
+2025-05-30 15:21:45,270 - TradingBot - INFO - [2023-02-19] Attempting to execute: buy 0.1 BTC-USD at ~24327.64
+2025-05-30 15:21:45,270 - TradingBot - INFO -     Executed BUY: 0.1 BTC-USD at 24327.64. Cost: 2432.76. Capital: 96250.73
+2025-05-30 15:21:45,274 - TradingBot - INFO - [BTC-USD] SELL Signal: Short MA (23087.85) crossed below Long MA (23205.19) at 22435.51 on 2023-03-05. Position before: 1
+2025-05-30 15:21:45,274 - TradingBot - INFO - [2023-03-05] Attempting to execute: sell 0.1 BTC-USD at ~22435.51
+2025-05-30 15:21:45,274 - TradingBot - INFO -     Executed SELL: 0.1 BTC-USD at 22435.51. Proceeds: 2243.55. Capital: 98494.28
+2025-05-30 15:21:45,279 - TradingBot - INFO - [BTC-USD] BUY Signal: Short MA (23610.88) crossed above Long MA (23476.38) at 26965.88 on 2023-03-18. Position before: -1
+2025-05-30 15:21:45,280 - TradingBot - INFO - [2023-03-18] Attempting to execute: buy 0.1 BTC-USD at ~26965.88
+2025-05-30 15:21:45,280 - TradingBot - INFO -     Executed BUY: 0.1 BTC-USD at 26965.88. Cost: 2696.59. Capital: 95797.69
+2025-05-30 15:21:45,290 - TradingBot - INFO - [BTC-USD] SELL Signal: Short MA (28574.54) crossed below Long MA (28641.39) at 28307.60 on 2023-04-25. Position before: 1
+2025-05-30 15:21:45,291 - TradingBot - INFO - [2023-04-25] Attempting to execute: sell 0.1 BTC-USD at ~28307.60
+2025-05-30 15:21:45,291 - TradingBot - INFO -     Executed SELL: 0.1 BTC-USD at 28307.60. Proceeds: 2830.76. Capital: 98628.45
+2025-05-30 15:21:45,293 - TradingBot - INFO - [BTC-USD] BUY Signal: Short MA (28991.46) crossed above Long MA (28971.37) at 29534.38 on 2023-05-05. Position before: -1
+2025-05-30 15:21:45,293 - TradingBot - INFO - [2023-05-05] Attempting to execute: buy 0.1 BTC-USD at ~29534.38
+2025-05-30 15:21:45,293 - TradingBot - INFO -     Executed BUY: 0.1 BTC-USD at 29534.38. Cost: 2953.44. Capital: 95675.01
+2025-05-30 15:21:45,294 - TradingBot - INFO - [BTC-USD] SELL Signal: Short MA (28937.77) crossed below Long MA (29017.69) at 28454.98 on 2023-05-07. Position before: 1
+2025-05-30 15:21:45,294 - TradingBot - INFO - [2023-05-07] Attempting to execute: sell 0.1 BTC-USD at ~28454.98
+2025-05-30 15:21:45,294 - TradingBot - INFO -     Executed SELL: 0.1 BTC-USD at 28454.98. Proceeds: 2845.50. Capital: 98520.51
+2025-05-30 15:21:45,301 - TradingBot - INFO - [BTC-USD] BUY Signal: Short MA (27260.49) crossed above Long MA (27219.39) at 27119.07 on 2023-06-04. Position before: -1
+2025-05-30 15:21:45,301 - TradingBot - INFO - [2023-06-04] Attempting to execute: buy 0.1 BTC-USD at ~27119.07
+2025-05-30 15:21:45,301 - TradingBot - INFO -     Executed BUY: 0.1 BTC-USD at 27119.07. Cost: 2711.91. Capital: 95808.60
+2025-05-30 15:21:45,302 - TradingBot - INFO - [BTC-USD] SELL Signal: Short MA (27027.65) crossed below Long MA (27029.09) at 26346.00 on 2023-06-07. Position before: 1
+2025-05-30 15:21:45,302 - TradingBot - INFO - [2023-06-07] Attempting to execute: sell 0.1 BTC-USD at ~26346.00
+2025-05-30 15:21:45,302 - TradingBot - INFO -     Executed SELL: 0.1 BTC-USD at 26346.00. Proceeds: 2634.60. Capital: 98443.20
+2025-05-30 15:21:45,306 - TradingBot - INFO - [BTC-USD] BUY Signal: Short MA (27091.22) crossed above Long MA (26878.52) at 29912.28 on 2023-06-22. Position before: -1
+2025-05-30 15:21:45,306 - TradingBot - INFO - [2023-06-22] Attempting to execute: buy 0.1 BTC-USD at ~29912.28
+2025-05-30 15:21:45,306 - TradingBot - INFO -     Executed BUY: 0.1 BTC-USD at 29912.28. Cost: 2991.23. Capital: 95451.98
+2025-05-30 15:21:45,314 - TradingBot - INFO - [BTC-USD] SELL Signal: Short MA (30307.60) crossed below Long MA (30383.24) at 29792.02 on 2023-07-20. Position before: 1
+2025-05-30 15:21:45,314 - TradingBot - INFO - [2023-07-20] Attempting to execute: sell 0.1 BTC-USD at ~29792.02
+2025-05-30 15:21:45,314 - TradingBot - INFO -     Executed SELL: 0.1 BTC-USD at 29792.02. Proceeds: 2979.20. Capital: 98431.18
+2025-05-30 15:21:45,329 - TradingBot - INFO - [BTC-USD] BUY Signal: Short MA (26195.73) crossed above Long MA (26174.51) at 26754.28 on 2023-09-18. Position before: -1
+2025-05-30 15:21:45,329 - TradingBot - INFO - [2023-09-18] Attempting to execute: buy 0.1 BTC-USD at ~26754.28
+2025-05-30 15:21:45,329 - TradingBot - INFO -     Executed BUY: 0.1 BTC-USD at 26754.28. Cost: 2675.43. Capital: 95755.75
+2025-05-30 15:21:45,378 - TradingBot - INFO - Backtest finished.
+2025-05-30 15:21:45,380 - TradingBot - INFO - --- Backtest Summary ---
+2025-05-30 15:21:45,380 - TradingBot - INFO - Symbol: BTC-USD
+2025-05-30 15:21:45,380 - TradingBot - INFO - Strategy: MovingAverageCrossoverStrategy
+2025-05-30 15:21:45,380 - TradingBot - INFO - Period: 2022-01-01 to 2023-12-30
+2025-05-30 15:21:45,380 - TradingBot - INFO - Initial Capital: $100,000.00
+2025-05-30 15:21:45,380 - TradingBot - INFO - Final Portfolio Value: $99,971.44
+2025-05-30 15:21:45,380 - TradingBot - INFO - Total Return: -0.03%
+2025-05-30 15:21:45,380 - TradingBot - INFO - Total Trades Executed (legs): 31
+2025-05-30 15:21:45,380 - TradingBot - INFO - Annualized Sharpe Ratio (rf=0%): -0.01
+2025-05-30 15:21:45,380 - TradingBot - INFO - Maximum Drawdown: -1.96%
+2025-05-30 15:21:45,380 - TradingBot - INFO - Win Rate (Round Trips): 26.67%
+2025-05-30 15:21:45,380 - TradingBot - INFO - Profit Factor (Round Trips): 0.31
+2025-05-30 15:21:45,380 - TradingBot - INFO - --- Trades --- 
+2025-05-30 15:21:45,380 - TradingBot - INFO - 
+=== Backtest Summary ===
+2025-05-30 15:21:45,381 - TradingBot - INFO - Period: 2022-01-01 to 2023-12-30
+2025-05-30 15:21:45,381 - TradingBot - INFO - Initial Capital: $100,000.00
+2025-05-30 15:21:45,381 - TradingBot - INFO - Final Portfolio Value: $99,971.44
+2025-05-30 15:21:45,381 - TradingBot - INFO - Total Return: $-28.56 (-0.03%)
+2025-05-30 15:21:45,381 - TradingBot - INFO - Annualized Return: -0.01%
+2025-05-30 15:21:45,381 - TradingBot - INFO - Sharpe Ratio: -0.01
+2025-05-30 15:21:45,381 - TradingBot - INFO - Max Drawdown: -1.96%
+2025-05-30 15:21:45,381 - TradingBot - INFO - Total Trades: 31
+2025-05-30 15:21:45,381 - TradingBot - INFO - Win Rate: 26.7%
+2025-05-30 15:21:45,381 - TradingBot - INFO - Profit Factor: 0.31
+2025-05-30 15:21:45,381 - TradingBot - INFO - 
+=== Trades ===
+2025-05-30 15:21:45,381 - TradingBot - INFO -   2022-02-08: BUY 0.1 BTC-USD at 44118.45 (Cost: 4411.84)
+2025-05-30 15:21:45,381 - TradingBot - INFO -   2022-02-24: SELL 0.1 BTC-USD at 38332.61 (Proceeds: 3833.26)
+2025-05-30 15:21:45,381 - TradingBot - INFO -   2022-03-09: BUY 0.1 BTC-USD at 41982.93 (Cost: 4198.29)
+2025-05-30 15:21:45,381 - TradingBot - INFO -   2022-03-10: SELL 0.1 BTC-USD at 39437.46 (Proceeds: 3943.75)
+2025-05-30 15:21:45,381 - TradingBot - INFO -   2022-03-18: BUY 0.1 BTC-USD at 41801.16 (Cost: 4180.12)
+2025-05-30 15:21:45,381 - TradingBot - INFO -   2022-04-12: SELL 0.1 BTC-USD at 40127.18 (Proceeds: 4012.72)
+2025-05-30 15:21:45,381 - TradingBot - INFO -   2022-06-06: BUY 0.1 BTC-USD at 31370.67 (Cost: 3137.07)
+2025-05-30 15:21:45,381 - TradingBot - INFO -   2022-06-12: SELL 0.1 BTC-USD at 26762.65 (Proceeds: 2676.26)
+2025-05-30 15:21:45,381 - TradingBot - INFO -   2022-07-13: BUY 0.1 BTC-USD at 20212.07 (Cost: 2021.21)
+2025-05-30 15:21:45,381 - TradingBot - INFO -   2022-08-22: SELL 0.1 BTC-USD at 21398.91 (Proceeds: 2139.89)
+2025-05-30 15:21:45,381 - TradingBot - INFO -   2022-09-16: BUY 0.1 BTC-USD at 19772.58 (Cost: 1977.26)
+2025-05-30 15:21:45,381 - TradingBot - INFO -   2022-09-20: SELL 0.1 BTC-USD at 18890.79 (Proceeds: 1889.08)
+2025-05-30 15:21:45,381 - TradingBot - INFO -   2022-10-11: BUY 0.1 BTC-USD at 19051.42 (Cost: 1905.14)
+2025-05-30 15:21:45,381 - TradingBot - INFO -   2022-10-15: SELL 0.1 BTC-USD at 19067.63 (Proceeds: 1906.76)
+2025-05-30 15:21:45,381 - TradingBot - INFO -   2022-10-26: BUY 0.1 BTC-USD at 20770.44 (Cost: 2077.04)
+2025-05-30 15:21:45,381 - TradingBot - INFO -   2022-11-10: SELL 0.1 BTC-USD at 17586.77 (Proceeds: 1758.68)
+2025-05-30 15:21:45,381 - TradingBot - INFO -   2022-12-07: BUY 0.1 BTC-USD at 16848.13 (Cost: 1684.81)
+2025-05-30 15:21:45,381 - TradingBot - INFO -   2022-12-23: SELL 0.1 BTC-USD at 16796.95 (Proceeds: 1679.70)
+2025-05-30 15:21:45,381 - TradingBot - INFO -   2023-01-10: BUY 0.1 BTC-USD at 17446.29 (Cost: 1744.63)
+2025-05-30 15:21:45,381 - TradingBot - INFO -   2023-02-13: SELL 0.1 BTC-USD at 21808.10 (Proceeds: 2180.81)
+2025-05-30 15:21:45,381 - TradingBot - INFO -   2023-02-19: BUY 0.1 BTC-USD at 24327.64 (Cost: 2432.76)
+2025-05-30 15:21:45,381 - TradingBot - INFO -   2023-03-05: SELL 0.1 BTC-USD at 22435.51 (Proceeds: 2243.55)
+2025-05-30 15:21:45,381 - TradingBot - INFO -   2023-03-18: BUY 0.1 BTC-USD at 26965.88 (Cost: 2696.59)
+2025-05-30 15:21:45,381 - TradingBot - INFO -   2023-04-25: SELL 0.1 BTC-USD at 28307.60 (Proceeds: 2830.76)
+2025-05-30 15:21:45,381 - TradingBot - INFO -   2023-05-05: BUY 0.1 BTC-USD at 29534.38 (Cost: 2953.44)
+2025-05-30 15:21:45,381 - TradingBot - INFO -   2023-05-07: SELL 0.1 BTC-USD at 28454.98 (Proceeds: 2845.50)
+2025-05-30 15:21:45,381 - TradingBot - INFO -   2023-06-04: BUY 0.1 BTC-USD at 27119.07 (Cost: 2711.91)
+2025-05-30 15:21:45,381 - TradingBot - INFO -   2023-06-07: SELL 0.1 BTC-USD at 26346.00 (Proceeds: 2634.60)
+2025-05-30 15:21:45,381 - TradingBot - INFO -   2023-06-22: BUY 0.1 BTC-USD at 29912.28 (Cost: 2991.23)
+2025-05-30 15:21:45,381 - TradingBot - INFO -   2023-07-20: SELL 0.1 BTC-USD at 29792.02 (Proceeds: 2979.20)
+2025-05-30 15:21:45,381 - TradingBot - INFO -   2023-09-18: BUY 0.1 BTC-USD at 26754.28 (Cost: 2675.43)

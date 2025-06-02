@@ -143,8 +143,12 @@ class Backtester:
 
     def print_summary(self):
         """Prints a summary of the backtest results and returns key metrics."""
-        """Prints a summary of the backtest results."""
-        raw_final_portfolio_value = self.portfolio_history[-1]['value'] if self.portfolio_history else self.initial_capital
+        if not self.portfolio_history:
+            logger.warning("No portfolio history available for summary.")
+            return {}
+            
+        # Get final portfolio value
+        raw_final_portfolio_value = self.portfolio_history[-1]['value']
         final_portfolio_value = None
 
         if isinstance(raw_final_portfolio_value, pd.Series):
@@ -202,18 +206,58 @@ class Backtester:
         if num_trades > 0:
             logger.info("--- Trades --- ")
 
+        # Calculate metrics
+        total_return = final_portfolio_value - self.initial_capital
+        total_return_pct = (total_return / self.initial_capital) * 100
+        
+        # Calculate annualized return (assuming daily data)
+        days = (self.data.index[-1] - self.data.index[0]).days
+        years = max(days / 365.25, 0.1)  # Avoid division by zero
+        annualized_return_pct = ((1 + total_return/self.initial_capital) ** (1/years) - 1) * 100
+        
+        # Calculate Sharpe ratio (simplified, assuming risk-free rate = 0)
+        sharpe_ratio = self._calculate_sharpe_ratio(self.periodic_returns) if hasattr(self, 'periodic_returns') and self.periodic_returns else 0.0
+        
+        # Calculate max drawdown
+        portfolio_values = [p['value'] for p in self.portfolio_history]
+        max_drawdown = self._calculate_max_drawdown(portfolio_values)
+        
+        # Calculate win rate and profit factor
+        win_rate, profit_factor = self._calculate_win_rate_profit_factor()
+        
+        # Get number of trades
+        num_trades = len(self.trades) if hasattr(self, 'trades') else 0
+        
         # Prepare metrics dictionary for return
         metrics = {
             'initial_capital': self.initial_capital,
             'final_portfolio_value': final_portfolio_value,
+            'total_return': total_return,
             'total_return_pct': total_return_pct,
-            'total_trades_executed': num_trades,
-            'sharpe_ratio': sharpe_ratio if 'sharpe_ratio' in locals() and self.periodic_returns else 0.0,
-            'max_drawdown': max_drawdown,
-            'win_rate': win_rate if win_rate is not None else 0.0,
+            'annualized_return_pct': annualized_return_pct,
+            'sharpe_ratio': sharpe_ratio,
+            'max_drawdown': max_drawdown * 100,  # Convert to percentage
+            'num_trades': num_trades,
+            'win_rate': (win_rate * 100) if win_rate is not None else 0.0,
             'profit_factor': profit_factor if profit_factor is not None else 0.0
         }
-        return metrics
+        
+        # Print summary
+        logger.info("\n=== Backtest Summary ===")
+        logger.info(f"Period: {self.data.index[0].date()} to {self.data.index[-1].date()}")
+        logger.info(f"Initial Capital: ${self.initial_capital:,.2f}")
+        logger.info(f"Final Portfolio Value: ${final_portfolio_value:,.2f}")
+        logger.info(f"Total Return: ${total_return:,.2f} ({total_return_pct:.2f}%)")
+        logger.info(f"Annualized Return: {annualized_return_pct:.2f}%")
+        logger.info(f"Sharpe Ratio: {sharpe_ratio:.2f}")
+        logger.info(f"Max Drawdown: {max_drawdown * 100:.2f}%")
+        logger.info(f"Total Trades: {num_trades}")
+        logger.info(f"Win Rate: {win_rate * 100 if win_rate is not None else 0.0:.1f}%")
+        logger.info(f"Profit Factor: {profit_factor if profit_factor is not None else 0.0:.2f}")
+        
+        # Log all trades if any
+        if hasattr(self, 'trades') and self.trades:
+            logger.info("\n=== Trades ===")
             for trade in self.trades:
                 log_msg = f"  {trade['timestamp'].date()}: {trade['side']} {trade['amount']} {trade['symbol']} at {trade['price']:.2f}"
                 if 'cost' in trade:
@@ -221,6 +265,8 @@ class Backtester:
                 elif 'proceeds' in trade:
                     log_msg += f" (Proceeds: {trade['proceeds']:.2f})"
                 logger.info(log_msg)
+        
+        return metrics
 
     def _calculate_sharpe_ratio(self, returns, risk_free_rate=0.0, periods_per_year=252):
         """Calculates annualized Sharpe ratio."""
