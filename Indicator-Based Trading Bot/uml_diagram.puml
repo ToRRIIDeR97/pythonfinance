@@ -1,6 +1,6 @@
 @startuml
 ' skinparam style strictuml
-title Trading Bot UML Diagram
+title Trading Bot UML Diagram - Updated
 
 package "Configuration" {
   class Config {
@@ -12,6 +12,12 @@ package "Configuration" {
     + MA_LONG_WINDOW: int
     --
     + load_config()
+    + yfinance>=0.2.36
+    + pandas>=2.0.0
+    + numpy>=1.24.0
+    + matplotlib>=3.7.0
+    + scipy>=1.10.0
+    + reportlab>=3.6.0
   }
 }
 
@@ -32,6 +38,7 @@ package "DataHandling" {
   class DataFetcher {
     + fetch_historical_data(symbol, start_date, end_date): DataFrame
   }
+  note right of DataFetcher: Core data fetching logic\n(e.g., `download_data()`) is in `main.py`.
 
   class DataHandler {
     - htx_client: HTXClient
@@ -41,27 +48,20 @@ package "DataHandling" {
     + get_market_data(symbol): dict
     + calculate_ofi(order_book_data): float
   }
+   note right of DataHandler: Indicator calculation logic\n(e.g., `calculate_indicators()`) is in `main.py`.
 }
 
 package "Strategy" {
-  interface Strategy {
-    + generate_signal(data): str
+  interface IStrategy {
+    + generate_signals(data): DataFrame
   }
 
-  class OFIStrategy implements Strategy {
-    - ofi_threshold: float
-    --
-    + __init__(ofi_threshold)
-    + generate_signal(ofi_value): str
-  }
-
-  class MovingAverageCrossoverStrategy implements Strategy {
-    - short_window: int
-    - long_window: int
-    --
-    + __init__(short_window, long_window)
-    + generate_signal(historical_data): str
-  }
+  class RsiStrategy << (S,orchid) >> implements IStrategy
+  class MacdStrategy << (S,orchid) >> implements IStrategy
+  class MaCrossStrategy << (S,orchid) >> implements IStrategy
+  class ConvergingSignalsStrategy << (S,orchid) >> implements IStrategy
+  
+  note bottom of Strategy: Strategy classes (RsiStrategy, MacdStrategy, etc.)\nare defined in `main.py` and implement IStrategy.
 }
 
 package "OrderManagement" {
@@ -87,7 +87,7 @@ package "RiskManagement" {
 
 package "Backtesting" {
   class Backtester {
-    - strategy: Strategy
+    - strategy: IStrategy
     - historical_data: DataFrame
     - initial_capital: float
     - trades: list
@@ -99,10 +99,10 @@ package "Backtesting" {
     + calculate_performance_metrics(): dict
     + print_summary()
   }
-}
+  note right of Backtester: Core backtesting logic\n(e.g., `backtest_strategy()`, `calculate_performance_metrics()`)\nis in `main.py`.
 
-package "Application" {
-  class Main {
+  class Optimizer {
+    ' + optimize_strategy_params()
     ' Entry point logic
     + run_live_trading()
     + run_backtesting_mode()
