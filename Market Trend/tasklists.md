@@ -120,6 +120,26 @@ Below are actionable, trackable tasks derived from the WBS, UML, and Architectur
 - [ ] Create PerformanceMetrics component for portfolio tracking
 - [ ] Build UserPreferences component for dashboard personalization
 
+### Heatmap Metrics Enhancements
+- [x] Default heatmap metric to Market Cap
+- [x] Display selected metric values in sector and stocks grids
+- [x] Make treemap size follow selected metric; keep color as returns
+- [x] Update treemap title and tooltip to reflect selected metric
+
+### Comparison View Fixes
+- [x] Normalize historical results to arrays in comparison component
+- [x] Add defensive filtering for missing `close`/`date` fields
+- [x] Validate comparison chart, correlations, and performance load without errors
+
+### Heatmap Consolidation
+- [x] Refactor heatmap to a single treemap-only view
+- [x] Encode volatility via color saturation; returns drive hue
+- [x] Update treemap labels and tooltip to show return + volatility
+
+### Heatmap Palette Tuning
+- [x] Use lighter green/red hues for treemap tiles
+- [x] Remove white text outlines and set readable label color
+
 ## Backend API Enhancements for Dashboard
 - [ ] Implement bulk market data endpoint for dashboard efficiency
 - [ ] Create comparison endpoint for multi-ticker data retrieval
@@ -138,6 +158,9 @@ Below are actionable, trackable tasks derived from the WBS, UML, and Architectur
 - [x] Align summary fetching to unified `/api/v1/summary/{ticker}` endpoint
 - [x] Map MarketCard summary fields to backend response names (price, change_pct)
 - [x] Fix Highcharts treemap missing module error (#17) by initializing modules
+- [x] Fix WebSocket available_tickers construction from list-of-dicts
+- [x] Update WebSocket subscription validation to use ticker sets
+- [x] Align WebSocket real-time payload keys with summary data fields
 - [ ] Fix health_check response encoding error in `main.py` (dict encode AttributeError)
 - [ ] Investigate intermittent 502 responses for `/api/v1/summary/{ticker}` requests
 - [ ] Investigate intermittent 502 responses for `/api/v1/markets/*/historical` requests

@@ -31,19 +31,7 @@
         </select>
       </div>
 
-      <div class="view-mode-selector">
-        <label class="control-label">View:</label>
-        <div class="view-mode-buttons">
-          <button
-            v-for="mode in viewModes"
-            :key="mode.value"
-            @click="selectedViewMode = mode.value"
-            :class="['view-mode-btn', { active: selectedViewMode === mode.value }]"
-          >
-            {{ mode.label }}
-          </button>
-        </div>
-      </div>
+      <!-- Simplified: always show Treemap view -->
     </div>
 
     <!-- Loading State -->
@@ -104,7 +92,7 @@
               <div class="sector-symbol">{{ sector.symbol }}</div>
               <div class="sector-name">{{ sector.name }}</div>
               <div class="sector-performance">
-                {{ formatMetricValue(sector.performance, selectedMetric) }}
+                {{ formatMetricValue(getSectorMetricValue(sector, selectedMetric), selectedMetric) }}
               </div>
               <div class="sector-change">
                 {{ formatChange(sector.change) }}
@@ -152,7 +140,7 @@
               <div class="stock-name">{{ stock.name }}</div>
               <div class="stock-price">${{ stock.price?.toFixed(2) }}</div>
               <div class="stock-performance">
-                {{ formatMetricValue(stock.performance, selectedMetric) }}
+                {{ formatMetricValue(getStockMetricValue(stock, selectedMetric), selectedMetric) }}
               </div>
             </div>
           </div>
@@ -232,8 +220,8 @@ import ErrorMessage from './ErrorMessage.vue'
 const loading = ref(false)
 const error = ref(null)
 const selectedTimeFrame = ref('1d')
-const selectedMetric = ref('return')
-const selectedViewMode = ref('sectors')
+const selectedMetric = ref('marketCap')
+const selectedViewMode = ref('treemap')
 const selectedSector = ref(null)
 const selectedSectorDetails = ref(null)
 const showSectorModal = ref(false)
@@ -292,9 +280,8 @@ const timeFrames = [
   { label: '1Y', value: '1y' }
 ]
 
+// Only Treemap view is available
 const viewModes = [
-  { label: 'Sectors', value: 'sectors' },
-  { label: 'Stocks', value: 'stocks' },
   { label: 'Treemap', value: 'treemap' }
 ]
 
@@ -316,12 +303,28 @@ const mockSectorData = [
 const treemapOptions = computed(() => {
   if (!sectorData.value.length) return {}
 
-  const data = sectorData.value.map(sector => ({
-    name: sector.name,
-    value: Math.abs(sector.marketCap || 1000000000),
-    colorValue: sector.performance,
-    symbol: sector.symbol
-  }))
+  const metricLabel = getMetricLabel(selectedMetric.value)
+
+  const data = sectorData.value.map(sector => {
+    const metricVal = getSectorMetricValue(sector, selectedMetric.value)
+    const value = Math.abs(metricVal ?? (sector.marketCap ?? 1000000000))
+    const metricFormatted = formatMetricValue(metricVal, selectedMetric.value)
+    const ret = sector.performance
+    const vol = sector.volatility
+    const color = computeTileColor(ret, vol)
+    return {
+      name: sector.name,
+      value,
+      // Encode both metrics in color: hue by return, saturation by volatility
+      color,
+      symbol: sector.symbol,
+      metric: metricVal,
+      metricLabel,
+      metricFormatted,
+      returnPct: ret,
+      volatilityPct: vol
+    }
+  })
 
   return {
     chart: {
@@ -330,20 +333,11 @@ const treemapOptions = computed(() => {
       backgroundColor: 'transparent'
     },
     title: {
-      text: `Market Treemap - ${selectedMetric.value === 'return' ? 'Performance' : selectedMetric.value}`,
+      text: `Market Treemap — Size: ${metricLabel} • Color: Return (hue), Volatility (saturation)`,
       style: {
         fontSize: '16px',
         fontWeight: '600'
       }
-    },
-    colorAxis: {
-      minColor: '#ef4444',
-      maxColor: '#10b981',
-      stops: [
-        [0, '#ef4444'],
-        [0.5, '#f3f4f6'],
-        [1, '#10b981']
-      ]
     },
     series: [{
       type: 'treemap',
@@ -351,14 +345,29 @@ const treemapOptions = computed(() => {
       data: data,
       dataLabels: {
         enabled: true,
-        format: '{point.name}<br/>{point.colorValue:.2f}%',
+        formatter: function () {
+          const name = this.point.name
+          const metric = this.point.metricFormatted
+          const ret = this.point.returnPct
+          const vol = this.point.volatilityPct
+          const retStr = ret !== undefined && ret !== null ? `${ret.toFixed(2)}%` : '-'
+          const volStr = vol !== undefined && vol !== null ? `${vol.toFixed(1)}%` : '-'
+          return `${name}<br/>${metric}<br/>R: ${retStr} · V: ${volStr}`
+        },
         style: {
-          fontWeight: 'bold',
-          fontSize: '12px'
+          fontWeight: '600',
+          fontSize: '12px',
+          textOutline: 'none',
+          color: '#111827'
         }
       },
       tooltip: {
-        pointFormat: '<b>{point.name}</b><br/>Performance: {point.colorValue:.2f}%<br/>Market Cap: ${point.value:,.0f}'
+        pointFormatter: function () {
+          const ret = this.returnPct !== undefined && this.returnPct !== null ? `${this.returnPct.toFixed(2)}%` : '-'
+          const vol = this.volatilityPct !== undefined && this.volatilityPct !== null ? `${this.volatilityPct.toFixed(1)}%` : '-'
+          const metricLine = `${this.metricLabel}: ${formatMetricValue(this.metric, selectedMetric.value)}`
+          return `<b>${this.name}</b><br/>Return: ${ret}<br/>Volatility: ${vol}<br/>${metricLine}`
+        }
       }
     }]
   }
@@ -421,14 +430,69 @@ function getPerformanceIntensity(performance) {
 }
 
 function getCellSize(sector) {
-  if (selectedMetric.value === 'marketCap') {
-    const maxMarketCap = Math.max(...sectorData.value.map(s => s.marketCap || 0))
-    const minSize = 120
-    const maxSize = 200
-    const ratio = (sector.marketCap || 0) / maxMarketCap
+  const minSize = 120
+  const maxSize = 200
+  const metric = selectedMetric.value
+
+  if (metric === 'marketCap') {
+    const maxVal = Math.max(...sectorData.value.map(s => s.marketCap || 0)) || 1
+    const ratio = (sector.marketCap || 0) / maxVal
     return `${minSize + (maxSize - minSize) * ratio}px`
   }
+
+  if (metric === 'volume') {
+    const maxVal = Math.max(...sectorData.value.map(s => s.volume || 0)) || 1
+    const ratio = (sector.volume || 0) / maxVal
+    return `${minSize + (maxSize - minSize) * ratio}px`
+  }
+
+  // For return and volatility, keep consistent cell size
   return '150px'
+}
+
+function getSectorMetricValue(sector, metric) {
+  switch (metric) {
+    case 'return':
+      return sector.performance
+    case 'volume':
+      return sector.volume
+    case 'marketCap':
+      return sector.marketCap
+    case 'volatility':
+      return sector.volatility
+    default:
+      return sector.performance
+  }
+}
+
+function getStockMetricValue(stock, metric) {
+  switch (metric) {
+    case 'return':
+      return stock.performance
+    case 'volume':
+      return stock.volume
+    case 'marketCap':
+      return stock.marketCap
+    case 'volatility':
+      return stock.volatility
+    default:
+      return stock.performance
+  }
+}
+
+function getMetricLabel(metric) {
+  switch (metric) {
+    case 'return':
+      return 'Return (%)'
+    case 'volume':
+      return 'Volume'
+    case 'marketCap':
+      return 'Market Cap'
+    case 'volatility':
+      return 'Volatility'
+    default:
+      return metric
+  }
 }
 
 function formatMetricValue(value, metric) {
@@ -466,6 +530,37 @@ function formatMarketCap(marketCap) {
   if (marketCap >= 1000000000) return `$${(marketCap / 1000000000).toFixed(1)}B`
   if (marketCap >= 1000000) return `$${(marketCap / 1000000).toFixed(1)}M`
   return `$${marketCap.toFixed(0)}`
+}
+
+// Helpers for color encoding (return → hue, volatility → saturation)
+function clamp(val, min, max) {
+  return Math.max(min, Math.min(max, val))
+}
+
+function mapRange(val, inMin, inMax, outMin, outMax) {
+  const v = clamp(val, inMin, inMax)
+  const ratio = (v - inMin) / (inMax - inMin)
+  return outMin + ratio * (outMax - outMin)
+}
+
+function hslToHex(h, s, l) {
+  s /= 100
+  l /= 100
+  const k = n => (n + h / 30) % 12
+  const a = s * Math.min(l, 1 - l)
+  const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)))
+  const toHex = x => Math.round(255 * x).toString(16).padStart(2, '0')
+  return `#${toHex(f(0))}${toHex(f(8))}${toHex(f(4))}`
+}
+
+function computeTileColor(returnPct, volatilityPct) {
+  // Hue: returns [-5%, +5%] → [0 red, 135 green]
+  const hue = mapRange(returnPct ?? 0, -5, 5, 0, 135)
+  // Saturation: volatility [10%, 40%] → [25%, 50%] (lighter palette)
+  const saturation = mapRange(volatilityPct ?? 20, 10, 40, 25, 50)
+  // Lightness: keep tiles light for readability
+  const lightness = 82
+  return hslToHex(hue, saturation, lightness)
 }
 
 function drillDownToSector(sector) {

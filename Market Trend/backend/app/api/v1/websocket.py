@@ -48,7 +48,9 @@ class ConnectionManager:
             "type": "connection_established",
             "connection_id": connection_id,
             "timestamp": datetime.utcnow().isoformat(),
-            "available_tickers": list(GLOBAL_INDICES.keys()) + list(US_SECTOR_ETFS.keys())
+            # Tickers are defined as lists of dicts; extract symbols safely
+            "available_tickers": [i.get("ticker") for i in GLOBAL_INDICES if i.get("ticker")] +
+                                 [e.get("ticker") for e in US_SECTOR_ETFS if e.get("ticker")]
         }, connection_id)
     
     def disconnect(self, connection_id: str):
@@ -210,10 +212,11 @@ class RealTimeDataService:
                     "ticker": ticker,
                     "timestamp": now.isoformat(),
                     "data": {
-                        "current_price": summary_data.get("current_price"),
+                        # Align keys with frontend expectations while mapping from summary fields
+                        "current_price": summary_data.get("price"),
                         "change": summary_data.get("change"),
-                        "change_percent": summary_data.get("change_percent"),
-                        "volume": summary_data.get("volume"),
+                        "change_percent": summary_data.get("change_pct"),
+                        "volume": summary_data.get("volume") or summary_data.get("volume_avg_20d"),
                         "market_cap": summary_data.get("market_cap"),
                         "high_52w": summary_data.get("high_52w"),
                         "low_52w": summary_data.get("low_52w")
@@ -267,7 +270,10 @@ async def websocket_endpoint(
             if message_type == "subscribe":
                 # Subscribe to ticker updates
                 ticker = message.get("ticker", "").upper()
-                if ticker in GLOBAL_INDICES or ticker in US_SECTOR_ETFS:
+                # Build allowed ticker sets from lists of dicts
+                index_tickers = {i.get("ticker") for i in GLOBAL_INDICES if i.get("ticker")}
+                etf_tickers = {e.get("ticker") for e in US_SECTOR_ETFS if e.get("ticker")}
+                if ticker in index_tickers or ticker in etf_tickers:
                     manager.subscribe_to_ticker(connection_id, ticker)
                     
                     # Send immediate data if available

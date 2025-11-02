@@ -419,10 +419,17 @@ async function loadComparisonData() {
       })
     )
 
-    const results = await Promise.all(promises)
-    processChartData(results)
-    calculateCorrelations(results)
-    calculatePerformanceMetrics(results)
+    // Normalize API results to arrays of OHLC objects
+    const rawResults = await Promise.all(promises)
+    const results = rawResults.map(r => Array.isArray(r) ? r : (r?.data ?? []))
+    // Remove invalid points without close/date to prevent runtime errors
+    const cleanResults = results.map(series =>
+      (series || []).filter(p => p && typeof p.close === 'number' && p.date)
+    )
+
+    processChartData(cleanResults)
+    calculateCorrelations(cleanResults)
+    calculatePerformanceMetrics(cleanResults)
   } catch (err) {
     error.value = err.message || 'Failed to load comparison data'
   } finally {
