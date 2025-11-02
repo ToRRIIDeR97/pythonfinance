@@ -1,0 +1,78 @@
+Portfolio Backtester - Usage Guide
+================================
+
+This guide explains how to run the portfolio backtester with different configurations.
+
+Basic Command
+------------
+python main.py [options]
+
+Available Options:
+------------------
+
+1. Run Baseline Strategy (Static Allocation)
+   python main.py --run-baseline
+   - Runs the baseline strategic asset allocation (SAA) with no tactical adjustments
+   - Uses the base allocation defined in the code
+
+2. Run Initial TAA (Tactical Asset Allocation)
+   python main.py --run-initial-taa
+   - Runs with the initial tactical adjustments
+   - Adjusts allocations based on market regimes (Bull/Bear/Stagnation)
+
+3. Run Optimizations
+   python main.py --run-optimization [--opt-objective {cagr|mdd|sharpe|all}]
+   - Runs optimization to find best allocations for each regime
+   - Objectives:
+     - cagr: Maximize Compound Annual Growth Rate
+     - mdd: Minimize Maximum Drawdown
+     - sharpe: Maximize Sharpe Ratio (risk-adjusted returns)
+     - all: Run all three optimizations (default)
+
+4. Rolling Window Analysis
+   python main.py --run-rolling \
+       --rolling-window-years 5 \
+       --rolling-step-months 1 \
+       --overall-start-date "2015-01-01" \
+       --overall-end-date "2024-12-31"
+   - Runs backtest in rolling windows
+   - Parameters:
+     - rolling-window-years: Length of each window in years
+     - rolling-step-months: How many months to move the window forward each time
+     - overall-start/end-date: Full date range to analyze
+
+5. Combine Options (Example)
+   python main.py --run-optimization --opt-objective sharpe --run-rolling
+   - Runs Sharpe optimization across rolling windows
+
+6. Generate PDF Report
+   - A PDF report is automatically generated after each backtest
+   - Saved in the 'reports' directory with timestamp
+   - Includes performance metrics and allocation charts
+
+Example Scenarios:
+-----------------
+1. Quick test with initial TAA:
+   python main.py --run-initial-taa
+
+2. Find best allocations for max Sharpe ratio:
+   python main.py --run-optimization --opt-objective sharpe
+
+3. Full rolling window analysis with all optimizations:
+   python main.py --run-optimization --run-rolling \
+       --rolling-window-years 3 \
+       --rolling-step-months 3 \
+       --overall-start-date "2015-01-01" \
+       --overall-end-date "2024-12-31"
+
+Notes:
+------
+- All dates should be in YYYY-MM-DD format
+- Results are saved in the 'reports' directory
+- The program will create necessary directories if they don't exist
+- For large date ranges or frequent rebalancing, runtime may be significant
+
+Dependencies:
+------------
+Install required packages with:
+pip install -r requirements.txt

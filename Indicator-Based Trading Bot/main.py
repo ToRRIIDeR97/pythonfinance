@@ -638,7 +638,7 @@ def optimize_strategy_params(raw_data_df, strategy_class, param_config,
 
 # --- 6. Main Execution Block ---
 if __name__ == "__main__":
-    TICKER = 'AAPL'
+    TICKER = 'MSFT'
     START_DATE = '2020-01-01'
     END_DATE = '2024-12-31'
 
